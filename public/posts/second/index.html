@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en-us"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="技术栈（固定约定）
+
+后端：Spring Boot4 (Java 17), Maven
+MongoDB：文件元数据 / 目录树
+MySQL：用户 / 权限 / 强一致业务（可选）
+Redis：缓存、Token、进度、锁、队列
+存储：MinIO (S3 API) / 本地磁盘（开发）
+异步队列：Redis Streams / Kafka
+运维：Docker Compose / Kubernetes，Prometheus &#43; Grafana，ELK/Loki 日志
+
+
+主数据模型（MongoDB 文档示例）
+每个文件或目录一条文档（files 集合）：
+{
+  &#34;_id&#34;: ObjectId(&#34;...&#34;),
+  &#34;fileId&#34;: &#34;uuid-1234&#34;,
+  &#34;userId&#34;: &#34;uid1&#34;,
+  &#34;parentId&#34;: &#34;uuid-parent&#34;,      // &#34;root&#34; 表示根目录
+  &#34;name&#34;: &#34;简历.pdf&#34;,
+  &#34;type&#34;: &#34;FILE&#34;,                 // FILE | DIR
+  &#34;size&#34;: 102400,
+  &#34;hash&#34;: &#34;md5sha1&#34;,
+  &#34;storagePath&#34;: &#34;s3://bucket/objpath&#34;,
+  &#34;status&#34;: &#34;MERGED&#34;,             // UPLOADING | MERGING | MERGED | DELETED
+  &#34;chunks&#34;: {
+    &#34;total&#34;: 256,
+    &#34;chunkSize&#34;: 4*1024*1024
+  },
+  &#34;meta&#34;: { ... },                // tags, version 等扩展字段
+  &#34;createdAt&#34;: ISODate,
+  &#34;updatedAt&#34;: ISODate
+}
+索引建议">  
+
+  <title>
+    
+      Netdisk项目技术说明（面向实现）
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.51652302d3a998bf7887aed5c2cf89141bbebdf45a2c8f87b0717a3cf4f51c4e53c694c328fb1de78c3a625a1c01f80745bf1f2f42c040647a245cbbb6c2d1d7.css" integrity="sha512-UWUjAtOpmL94h67Vws&#43;JFBu&#43;vfRaLI&#43;HsHF6PPT1HE5TxpTDKPsd54w6YlocAfgHRb8fL0LAQGR6JFy7tsLR1w==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+                <div class="post-meta">
+                    <a href="/">..</a>
+
+                    <p>
+                        <time datetime="2025-12-12 21:04:52 &#43;0800 CST">
+                            2025-12-12
+                        </time>
+                    </p>
+                </div>
+
+<article>
+    <h1>Netdisk项目技术说明（面向实现）</h1>
+
+    
+        <aside  class="toc" >
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#技术栈固定约定">技术栈（固定约定）</a></li>
+    <li><a href="#主数据模型mongodb-文档示例">主数据模型（MongoDB 文档示例）</a></li>
+    <li><a href="#redis-key-设计前缀--用途">Redis Key 设计（前缀 + 用途）</a></li>
+    <li><a href="#api-设计最核心">API 设计（最核心）</a></li>
+    <li><a href="#分片上传与合并重点实现细节">分片上传与合并（重点实现细节）</a>
+      <ul>
+        <li><a href="#1-前端约定">1. 前端约定</a></li>
+        <li><a href="#2-服务端存储策略">2. 服务端存储策略</a></li>
+        <li><a href="#3-进度判断示例bitmap">3. 进度判断（示例：Bitmap）</a></li>
+        <li><a href="#4-合并注意点">4. 合并注意点</a></li>
+        <li><a href="#5-秒传的双重校验">5. 秒传的双重校验</a></li>
+      </ul>
+    </li>
+    <li><a href="#目录树列出重命名拷贝重点多层拷贝实现">目录树、列出、重命名、拷贝（重点：多层拷贝实现）</a>
+      <ul>
+        <li><a href="#存储表示">存储表示</a></li>
+        <li><a href="#拷贝目录算法伪码">拷贝目录（算法，伪码）</a></li>
+      </ul>
+    </li>
+    <li><a href="#并发控制与幂等性关键点">并发控制与幂等性（关键点）</a></li>
+    <li><a href="#mongodb-vs-mysql-分工决策">MongoDB vs MySQL 分工（决策）</a></li>
+    <li><a href="#迁移策略从原模板">迁移策略（从原模板）</a></li>
+    <li><a href="#测试与压测要点">测试与压测（要点）</a></li>
+    <li><a href="#监控与运维简要">监控与运维（简要）</a></li>
+    <li><a href="#部署建议开发--测试--生产">部署建议（开发 → 测试 → 生产）</a></li>
+    <li><a href="#关注的坑与防范必须说明">关注的坑与防范（必须说明）</a></li>
+    <li><a href="#最小实现优先级短任务清单">最小实现优先级（短任务清单）</a></li>
+  </ul>
+</nav>
+        </aside>
+    
+
+    <h2 id="技术栈固定约定">技术栈（固定约定）</h2>
+<ul>
+<li>后端：Spring Boot4 (Java 17), Maven</li>
+<li>MongoDB：文件元数据 / 目录树</li>
+<li>MySQL：用户 / 权限 / 强一致业务（可选）</li>
+<li>Redis：缓存、Token、进度、锁、队列</li>
+<li>存储：MinIO (S3 API) / 本地磁盘（开发）</li>
+<li>异步队列：Redis Streams / Kafka</li>
+<li>运维：Docker Compose / Kubernetes，Prometheus + Grafana，ELK/Loki 日志</li>
+</ul>
+<hr>
+<h2 id="主数据模型mongodb-文档示例">主数据模型（MongoDB 文档示例）</h2>
+<p>每个文件或目录一条文档（<code>files</code> 集合）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;_id&#34;</span>: <span style="color:#960050;background-color:#1e0010">ObjectId(</span><span style="color:#e6db74">&#34;...&#34;</span><span style="color:#960050;background-color:#1e0010">)</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;fileId&#34;</span>: <span style="color:#e6db74">&#34;uuid-1234&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;userId&#34;</span>: <span style="color:#e6db74">&#34;uid1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parentId&#34;</span>: <span style="color:#e6db74">&#34;uuid-parent&#34;</span>,      <span style="color:#75715e">// &#34;root&#34; 表示根目录
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;简历.pdf&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;FILE&#34;</span>,                 <span style="color:#75715e">// FILE | DIR
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#f92672">&#34;size&#34;</span>: <span style="color:#ae81ff">102400</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;md5sha1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;storagePath&#34;</span>: <span style="color:#e6db74">&#34;s3://bucket/objpath&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;status&#34;</span>: <span style="color:#e6db74">&#34;MERGED&#34;</span>,             <span style="color:#75715e">// UPLOADING | MERGING | MERGED | DELETED
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#f92672">&#34;chunks&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;total&#34;</span>: <span style="color:#ae81ff">256</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;chunkSize&#34;</span>: <span style="color:#ae81ff">4</span><span style="color:#960050;background-color:#1e0010">*</span><span style="color:#ae81ff">1024</span><span style="color:#960050;background-color:#1e0010">*</span><span style="color:#ae81ff">1024</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;meta&#34;</span>: { <span style="color:#960050;background-color:#1e0010">...</span> },                <span style="color:#75715e">// tags, version 等扩展字段
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#f92672">&#34;createdAt&#34;</span>: <span style="color:#960050;background-color:#1e0010">ISODate</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;updatedAt&#34;</span>: <span style="color:#960050;background-color:#1e0010">ISODate</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>索引建议</strong></p>
+<ul>
+<li><code>{&quot;userId&quot;:1, &quot;parentId&quot;:1}</code> — 目录列出（最常用）</li>
+<li><code>{&quot;fileId&quot;:1}</code> — 快速定位</li>
+<li><code>{&quot;hash&quot;:1}</code> — 秒传查询（唯一或非唯一视需求）</li>
+<li>TTL 索引用于临时分享/临时状态集合（如果有）</li>
+</ul>
+<hr>
+<h2 id="redis-key-设计前缀--用途">Redis Key 设计（前缀 + 用途）</h2>
+<pre tabindex="0"><code>login:token:{token}        -&gt; userId (TTL e.g. 30m)
+file:hash:{md5}            -&gt; fileId
+upload:progress:{fileId}   -&gt; BITMAP or SET of chunkIndex
+lock:file:merge:{fileId}   -&gt; lock owner (use Redisson/RLock)
+download:token:{uuid}      -&gt; fileId (TTL e.g. 5m)
+user:list:{userId}:files   -&gt; cached paged lists (optional)
+upload:queue               -&gt; task queue (list/stream) for merges
+</code></pre><p><strong>Bitmap vs Set</strong></p>
+<ul>
+<li><strong>Bitmap</strong>（<code>SETBIT/GETBIT/BITCOUNT</code>）适合连续且上限确定的 chunkIndex：内存低、判断是否完成 O(1)（通过 BITCOUNT）。</li>
+<li><strong>Set</strong>（<code>SADD/SCARD</code>）适合稀疏或 chunkIndex 无上限场景，但内存更高。</li>
+</ul>
+<p>参数建议：默认 chunkSize = 4MB, maxChunks ~ 65536 =&gt; Bitmap 合理。</p>
+<hr>
+<h2 id="api-设计最核心">API 设计（最核心）</h2>
+<p>（仅列关键接口）</p>
+<ol>
+<li>
+<p><code>POST /api/upload/check</code>
+Input: <code>{ fileName, fileSize, fileHash, chunkSize }</code>
+Logic:</p>
+<ul>
+<li>查 <code>file:hash:{fileHash}</code> in Redis -&gt; if exists and storage exists -&gt; return <code>SECONDPASS</code> + fileId</li>
+<li>Else create/ensure <code>FileDocument</code> in Mongo with status <code>UPLOADING</code>, return <code>fileId</code> + <code>chunkSize</code> + <code>expectedChunks</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>POST /api/upload/chunk</code>
+Multipart/bytes: <code>{fileId, chunkIndex, chunkHash, chunkBytes}</code>
+Logic:</p>
+<ul>
+<li>Validate token/auth</li>
+<li>Verify chunkHash</li>
+<li>Save chunk to MinIO at <code>/{fileId}/chunk_{index}</code> (或临时本地)</li>
+<li>Mark Redis: <code>SETBIT upload:progress:{fileId} {chunkIndex} 1</code> (或 <code>SADD</code>)</li>
+<li>If BITCOUNT == totalChunks -&gt; push merge task to queue</li>
+<li>Return success</li>
+</ul>
+</li>
+<li>
+<p><code>POST /api/upload/merge</code> (can be invoked by client or worker)
+Input: <code>{fileId}</code>
+Logic:</p>
+<ul>
+<li>Try acquire <code>lock:file:merge:{fileId}</code> (Redisson RLock recommended)</li>
+<li>Validate all chunks present (Bitmap/Set check)</li>
+<li>Merge stream from MinIO chunks into final object (server-side compose if storage supports; otherwise stream and write)</li>
+<li>Compute final hash &amp; verify</li>
+<li>Update <code>files</code> doc: <code>status=MERGED</code>, <code>storagePath=...</code>, delete chunk objects and Redis progress key</li>
+<li>Release lock, produce event/notification</li>
+</ul>
+</li>
+<li>
+<p><code>GET /api/files?parentId=</code> — list directory by <code>userId</code> + <code>parentId</code> using index.</p>
+</li>
+<li>
+<p><code>POST /api/files/copy</code>
+Input: <code>{sourceId, targetParentId}</code> — see “拷贝实现”下文。</p>
+</li>
+</ol>
+<hr>
+<h2 id="分片上传与合并重点实现细节">分片上传与合并（重点实现细节）</h2>
+<h3 id="1-前端约定">1. 前端约定</h3>
+<ul>
+<li>客户端先计算 <code>fileHash</code>（MD5/SHA1）并 <code>POST /check</code></li>
+<li>根据 <code>chunkSize</code> 切片并并发上传 <code>chunk</code>，并在每片完成后上报</li>
+</ul>
+<h3 id="2-服务端存储策略">2. 服务端存储策略</h3>
+<ul>
+<li>分片直接存对象存储（路径 <code>{fileId}/chunk_{index}</code>）避免后端 I/O 瓶颈</li>
+<li>对象存储若支持 server-side compose（MinIO 不直接有合并 API，但可用 S3 Multipart Complete 或在 server 端合并流）</li>
+</ul>
+<h3 id="3-进度判断示例bitmap">3. 进度判断（示例：Bitmap）</h3>
+<ul>
+<li>写入：<code>SETBIT upload:progress:{fileId} {index} 1</code></li>
+<li>判断完成：<code>BITCOUNT upload:progress:{fileId}</code> == <code>expectedChunks</code></li>
+<li>原子性：单片上传写入后立即检查 BITCOUNT；若等于 expected -&gt; submit merge task</li>
+</ul>
+<h3 id="4-合并注意点">4. 合并注意点</h3>
+<ul>
+<li>使用 <strong>分布式锁</strong> 保证只有一个 worker/实例在合并（Redisson 推荐）</li>
+<li>合并必须幂等：检查 <code>status</code> 字段，若 <code>MERGED</code> 直接返回</li>
+<li>合并失败要可重试（任务记录中加 <code>attempts</code>, backoff）</li>
+<li>合并完成后删除 chunk objects 或按策略保留短期备份</li>
+</ul>
+<h3 id="5-秒传的双重校验">5. 秒传的双重校验</h3>
+<ul>
+<li>Redis <code>file:hash:{md5}</code> 命中后，仍需验证 MongoDB <code>files</code> 有对应 <code>storagePath</code> 且对象存储可读取（避免缓存污染）</li>
+</ul>
+<hr>
+<h2 id="目录树列出重命名拷贝重点多层拷贝实现">目录树、列出、重命名、拷贝（重点：多层拷贝实现）</h2>
+<h3 id="存储表示">存储表示</h3>
+<ul>
+<li>父引用模型（<code>parentId</code>）是主方案：简单、查询快，支持 pagination</li>
+<li>对于需要“一次拿到整棵树”的操作：用 Mongo <code>$graphLookup</code>（聚合）或递归查询（应用端）</li>
+</ul>
+<h3 id="拷贝目录算法伪码">拷贝目录（算法，伪码）</h3>
+<ol>
+<li>
+<p>获取源目录的所有后代（<code>descendants = graphLookup(sourceId)</code>）按层级排序（从上到下或 BFS）</p>
+</li>
+<li>
+<p>构建 ID 映射 <code>oldId -&gt; newId</code>（新 UUID）</p>
+</li>
+<li>
+<p>对每个节点按原来的顺序插入新文档：</p>
+<ul>
+<li>new.parentId = (old.parentId == sourceId) ? targetParentId : idMap[old.parentId]</li>
+<li>对文件节点不复制物理对象，直接指向同一 <code>storagePath</code>（实现为“软拷贝”）</li>
+<li>如果需要“物理拷贝”，则对对象存储执行 copyObject（代价大）</li>
+</ul>
+</li>
+<li>
+<p>批量写入（分批提交）保证效率</p>
+</li>
+<li>
+<p>返回新根 id</p>
+</li>
+</ol>
+<p><strong>复杂度与事务</strong></p>
+<ul>
+<li>大树复制可能很大，采用分批且异步完成（返回任务 id，异步 worker 完成）</li>
+<li>幂等：记录任务 id 并用 <code>status</code> 字段避免重复执行</li>
+</ul>
+<p><strong>避免环与验证</strong></p>
+<ul>
+<li>移动时需校验 <code>targetParentId</code> 不是 <code>source</code> 的子孙（避免环）</li>
+</ul>
+<hr>
+<h2 id="并发控制与幂等性关键点">并发控制与幂等性（关键点）</h2>
+<ul>
+<li><strong>幂等</strong>：所有写操作加 <code>opId</code> 或检查 <code>status</code>（例如合并 <code>status != MERGED</code> 才允许）</li>
+<li><strong>锁</strong>：使用 Redisson <code>RLock</code>（支持超时与自动续租）</li>
+<li><strong>Redis 超时策略</strong>：关键短生命周期 Key 需配置合理 TTL（例如 token 30m、download token 5m、upload progress 可长期存在直到合并完成）</li>
+<li><strong>异常回滚</strong>：合并中断要能恢复：合并前状态写为 <code>MERGING</code> + <code>mergeTaskId</code>，worker 恢复时可检测并继续</li>
+</ul>
+<hr>
+<h2 id="mongodb-vs-mysql-分工决策">MongoDB vs MySQL 分工（决策）</h2>
+<ul>
+<li><strong>MongoDB</strong>：文件元数据、目录树、灵活扩展字段、快速目录查询（推荐）</li>
+<li><strong>MySQL</strong>：用户表、权限、计费、强一致业务、审计日志（推荐）</li>
+<li>可采用混合存储：用户/权限在 MySQL，文件与目录在 MongoDB。业务跨库需要谨慎设计（尽量弱耦合，异步同步必要信息）。</li>
+</ul>
+<hr>
+<h2 id="迁移策略从原模板">迁移策略（从原模板）</h2>
+<ul>
+<li>阶段化：先引入 Mongo 做新功能（双写策略或同步层），验证后逐步切换查询路由</li>
+<li>数据迁移脚本：批量读取旧 MySQL 表，生成 Mongo 文档（map oldId-&gt;newId）</li>
+<li>回退：短期保留 MySQL 副本，确保回退路径</li>
+</ul>
+<hr>
+<h2 id="测试与压测要点">测试与压测（要点）</h2>
+<ul>
+<li>
+<p>单元测试：controller/service/repository 层</p>
+</li>
+<li>
+<p>集成测试：in-memory Mongo / Redis，或 docker-compose 环境</p>
+</li>
+<li>
+<p>并发压测：k6 / JMeter，重点场景：</p>
+<ul>
+<li>并发分片上传（并发数 100~1000 测试）</li>
+<li>并发秒传判断</li>
+<li>多并发合并任务（确保锁）</li>
+</ul>
+</li>
+<li>
+<p>故障注入场景：Redis 宕机、MinIO 权限错误、网络延迟</p>
+</li>
+</ul>
+<hr>
+<h2 id="监控与运维简要">监控与运维（简要）</h2>
+<ul>
+<li>指标：上传速率、合并失败率、Redis HIT/MISS、Mongo QPS、对象存储延迟</li>
+<li>警告：合并失败率阈值、Redis RTT 升高、Mongo 索引扫描过多</li>
+<li>备份：Mongo 定期备份（rsync / mongodump），MySQL binlog，MinIO 对象生命周期与异地备份</li>
+</ul>
+<hr>
+<h2 id="部署建议开发--测试--生产">部署建议（开发 → 测试 → 生产）</h2>
+<ul>
+<li>开发：docker-compose (app, mongodb, redis, minio)</li>
+<li>测试/生产：Kubernetes + Horizontal Pod Autoscaler，Redis 主从或托管服务，Mongo 副本集</li>
+<li>CI/CD：自动 build + 测试 + 镜像推送 + 自动部署（GitHub Actions / GitLab CI）</li>
+</ul>
+<hr>
+<h2 id="关注的坑与防范必须说明">关注的坑与防范（必须说明）</h2>
+<ul>
+<li>Redis 缓存污染（秒传命中但对象被删除）——二次校验对象存在</li>
+<li>合并幂等与重复消费——必须用锁 + status + opId</li>
+<li>大文件复制（物理复制开销大）——优先软拷贝（引用同 storagePath）</li>
+<li>Bitmap 大小评估不当导致内存浪费——估算 maxChunks 与动态切换策略</li>
+<li>跨库一致性（MySQL 与 Mongo）——避免同步强依赖，使用事件最终一致性</li>
+</ul>
+<hr>
+<h2 id="最小实现优先级短任务清单">最小实现优先级（短任务清单）</h2>
+<ol>
+<li>环境：Docker Compose (Mongo, Redis, MinIO, app)</li>
+<li>基本 CRUD：Mongo 文件文档 + list by parentId</li>
+<li>上传 check + chunk upload (单片上传、保存 chunk、Redis 标记)</li>
+<li>合并 worker + Redisson 锁 + status 更新</li>
+<li>秒传：file:hash Redis 记录 + 二次校验</li>
+<li>目录拷贝：实现异步任务，软拷贝元数据</li>
+<li>限流与 token、临时下载链接</li>
+<li>监控与压测</li>
+</ol>
+
+</article>
+
+            </div>
+        </main>
+    </body></html>

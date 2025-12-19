@@ -1,0 +1,4 @@
+baseURL = 'https://feiesos.github.io/'
+languageCode = 'en-us'
+title = "Feiesos' blog"
+theme = 'nostyleplease'
