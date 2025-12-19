@@ -4,6 +4,7 @@ draft = false
 title = 'Spring Boot快速入门'
 toc = true
 tocBorder = true
+tags = ["Spring Boot", "Tutorial"]
 +++
 
 ## 创建和启动Demo

@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "main.css",
-	"sourceRoot": "D:/Develop/Go/Blog",
+	"sourceRoot": "D:/Develop/Web/Blog",
 	"sources": [
 		"themes/nostyleplease/assets/css/main.scss"
 	],

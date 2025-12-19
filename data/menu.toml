@@ -12,6 +12,7 @@ title = "posts by category"
 
   [entries.post_list]
   section = "posts"
+  limit = 4
   show_more = true
   show_more_text = "See more posts..."
   show_more_url = "posts"
