@@ -351,6 +351,32 @@ Input: <code>{sourceId, targetParentId}</code> — see “拷贝实现”下文�
 <li>监控与压测</li>
 </ol>
 
+    
+    
+    
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    clientID: 'Ov23liutI7L71Kv4y4Qq',
+    clientSecret: 'afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2',
+    repo: 'https:\/\/github.com\/feiesos\/feiesos.github.io',
+    owner: 'feiesos',
+    admin: ['feiesos'],
+    id: location.pathname, 
+    distractionFreeMode: false 
+  });
+  (function() {
+    
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
+      return;
+    }
+    gitalk.render('gitalk-container');
+  })();
+</script>
+
 </article>
 
             </div>

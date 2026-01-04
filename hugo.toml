@@ -2,3 +2,12 @@ baseURL = 'https://feiesos.github.io/'
 languageCode = 'en-us'
 title = "Feiesos' blog"
 theme = 'nostyleplease'
+
+[params]
+  enableGitalk = true
+
+[params.gitalk]
+  clientID = "Ov23liutI7L71Kv4y4Qq"
+  clientSecret = "afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2"
+  repo = "https://github.com/feiesos/feiesos.github.io"
+  owner = "feiesos"
