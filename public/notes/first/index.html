@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="SpringBoot3快速入门
+自动配置机制
+SpringBoot默认扫包规则
+@SpringBootApplication标注的类就是主程序类。SpringBoot只会扫描主程序所在的包及其子包，相当于自动的component-scan（ssm）。
+当然也可以自定义配置扫包：
+
+
+通过@SpringBootApplication(scanBasePackages=&quot;you.package.path&quot;)注解的scanBasePackages参数配置
+@SpringBootApplication相当于同时使用以下三个注解：
+
+SpringBootConfiguration
+EnableAutoConfiguration
+ComponentScan
+
+
+
+当然也可以通过ComponentScan(&quot;your.package.path&quot;)注解来配置
+
+
+配置文件默认值
+
+
+配置文件的所有配置项是和某个类的对象值进行一一绑定的。这些类我们从称为配置属性类。
+比如，server.port这个配置项，对应ServerProperties类中的port成员变量。ServerProperties类绑定了所有Tomcat服务器有关的配置。
+
+
+按需加载自动配置
+导入场景spring-boot-starter-xxx，场景启动器（starter）除了会导入相关功能以外，还会导入一个spring-boot-starter，这是核心场景启动器，是所有starter的starter。
+spring-boot-starter导入了一个包spring-boot-autoconfigure。包里面是各种场景的AutoConfiguration自动配置类。
+虽然全场景的自动配置都在spring-boot-autoconfigure这个包，但是不都是全部开启的，而是按需开启，也就是导入了哪些就开启哪些。
+总结：导入场景启动器，触发spring-boot-autoconfigure包的自动配置生效，容器就会具有相关场景。
+核心技能
+常用注解
+
+
+组件注册
+
+@Configuration: 告诉Spring容器这是一个配置类（配置类本身也是容器中的组件）
+@SpringBootConfiguration: 告诉容器这是一个SpringBoot配置类，跟Configuration没区别，仅主要用于主应用类
+@Bean: 注册一个Bean，组件在容器中的名字默认是方法名，不过可以通过Bean(&ldquo;alias&rdquo;)设置组件名
+@Controller
+@Service
+@Repository
+@Component
+@Import
+@ComponentScan
+&hellip;
+
+组件默认是单实例的（每次获取都会获得同一个实例），可以通过@Scoop(&ldquo;prototype&rdquo;)设置组件为多实例（每次获取都会获得一个新的实例）。
+组件注册的步骤：
+1. 配置类注册@Configuration注解
+2. 在配置类中，自定义方法给容器中注册组件（配合@Bean）
+3. 或者使用@Import导入第三方组件
+
+
+条件注解
+如果注解置顶的条件成立，则触发指定行为。
+
+
+类似@ConditionalOnXxx的注解就是条件注解。
+例如@ConditionalOnClass，当类路径中存在这个类，则触发指定行为；相对的@ConditionalOnMissingClass反之。
+再比如@ConditionalOnBean，当容器中存在这个Bean（组件），则触发指定行为；相对的还有@ConditionalOnMissingBean。
+
+属性绑定
+@ConfigurationProperties和@EnableConfigurationProperties
+
+将容器汇总任意组件（Bean）的属性值和配置文件的配置项的值进行绑定
+使用@ConfigurationProperties进项绑定：
+1. 向容器中注册组件（使用@Compoent、@Bean等都可以）
+2. 使用@ConfigurationProperties(prefix=&ldquo;theitemtobind&rdquo;)注解（在需绑定的类或方法上）声明与配置文件中的对应的项（prefix参数的值）的绑定关系
+也可以使用@EnableConfigurationProperties进行绑定：
+- 只需在配置类上注解就能向容器中注册组件并绑定属性，这个注解其实就是整合了@Import和@ConfigurationProperties
+由于SpringBoot默认只扫描主程序所在的包，@EnableConfigurationProperties用于第三方组件的绑定，@ConfigurationProperties用于自己写的组件的绑定
+总结
+导入starter &ndash;&gt; 生效一系列的xxxAutoConfiguration自动配置类 &ndash;&gt; 在容器中注册很多组件 &ndash;&gt; 组件参数绑定在xxxProperties属性类中 &ndash;&gt; 关联配置文件
+|                                                         |
+使用Autowired自动装配                                           配置属性">  
+
+  <title>
+    
+      Spring Boot笔记
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2025-12-23 19:20:37 &#43;0800 CST">
+            2025-12-23
+        </time>
+    </p>
+
+    <h1>Spring Boot笔记</h1>
+
+    
+
+    <h1 id="springboot3快速入门">SpringBoot3快速入门</h1>
+<h2 id="自动配置机制">自动配置机制</h2>
+<h3 id="springboot默认扫包规则">SpringBoot默认扫包规则</h3>
+<p><code>@SpringBootApplication</code>标注的类就是主程序类。SpringBoot只会扫描主程序所在的包及其子包，相当于自动的component-scan（ssm）。
+当然也可以自定义配置扫包：</p>
+<ol>
+<li>
+<p>通过<code>@SpringBootApplication(scanBasePackages=&quot;you.package.path&quot;)</code>注解的scanBasePackages参数配置</p>
+<p>@SpringBootApplication相当于同时使用以下三个注解：</p>
+<ul>
+<li>SpringBootConfiguration</li>
+<li>EnableAutoConfiguration</li>
+<li>ComponentScan</li>
+</ul>
+</li>
+<li>
+<p>当然也可以通过<code>ComponentScan(&quot;your.package.path&quot;)</code>注解来配置</p>
+</li>
+</ol>
+<h3 id="配置文件默认值">配置文件默认值</h3>
+<ul>
+<li>
+<p>配置文件的所有配置项是和某个类的对象值进行一一绑定的。这些类我们从称为<strong>配置属性类</strong>。</p>
+<p>比如，server.port这个配置项，对应ServerProperties类中的port成员变量。ServerProperties类绑定了所有Tomcat服务器有关的配置。</p>
+</li>
+</ul>
+<h3 id="按需加载自动配置">按需加载自动配置</h3>
+<p>导入场景spring-boot-starter-xxx，场景启动器（starter）除了会导入相关功能以外，还会导入一个<code>spring-boot-starter</code>，这是核心场景启动器，是所有starter的starter。</p>
+<p>spring-boot-starter导入了一个包spring-boot-autoconfigure。包里面是各种场景的<code>AutoConfiguration</code>自动配置类。</p>
+<p>虽然全场景的自动配置都在spring-boot-autoconfigure这个包，但是不都是全部开启的，而是按需开启，也就是导入了哪些就开启哪些。</p>
+<p>总结：导入场景启动器，触发spring-boot-autoconfigure包的自动配置生效，容器就会具有相关场景。</p>
+<h2 id="核心技能">核心技能</h2>
+<h3 id="常用注解">常用注解</h3>
+<ol>
+<li>
+<p>组件注册</p>
+<ul>
+<li>@Configuration: 告诉Spring容器这是一个配置类（配置类本身也是容器中的组件）</li>
+<li>@SpringBootConfiguration: 告诉容器这是一个SpringBoot配置类，跟Configuration没区别，仅主要用于主应用类</li>
+<li>@Bean: 注册一个Bean，组件在容器中的名字默认是方法名，不过可以通过Bean(&ldquo;alias&rdquo;)设置组件名</li>
+<li>@Controller</li>
+<li>@Service</li>
+<li>@Repository</li>
+<li>@Component</li>
+<li>@Import</li>
+<li>@ComponentScan</li>
+<li>&hellip;</li>
+</ul>
+<p>组件默认是单实例的（每次获取都会获得同一个实例），可以通过@Scoop(&ldquo;prototype&rdquo;)设置组件为多实例（每次获取都会获得一个新的实例）。</p>
+<p>组件注册的步骤：
+1. 配置类注册@Configuration注解
+2. 在配置类中，自定义方法给容器中注册组件（配合@Bean）
+3. 或者使用@Import导入第三方组件</p>
+</li>
+<li>
+<p>条件注解
+如果注解置顶的条件成立，则触发指定行为。</p>
+</li>
+</ol>
+<p>类似@ConditionalOnXxx的注解就是条件注解。</p>
+<p>例如@ConditionalOnClass，当类路径中存在这个类，则触发指定行为；相对的@ConditionalOnMissingClass反之。</p>
+<p>再比如@ConditionalOnBean，当容器中存在这个Bean（组件），则触发指定行为；相对的还有@ConditionalOnMissingBean。</p>
+<ol start="3">
+<li>属性绑定
+@ConfigurationProperties和@EnableConfigurationProperties</li>
+</ol>
+<p>将容器汇总任意组件（Bean）的属性值和配置文件的配置项的值进行绑定</p>
+<p>使用@ConfigurationProperties进项绑定：
+1. 向容器中注册组件（使用@Compoent、@Bean等都可以）
+2. 使用@ConfigurationProperties(prefix=&ldquo;theitemtobind&rdquo;)注解（在需绑定的类或方法上）声明与配置文件中的对应的项（prefix参数的值）的绑定关系</p>
+<p>也可以使用@EnableConfigurationProperties进行绑定：
+- 只需在配置类上注解就能<code>向容器中注册组件</code>并<code>绑定属性</code>，这个注解其实就是整合了@Import和@ConfigurationProperties</p>
+<p>由于SpringBoot默认只扫描主程序所在的包，@EnableConfigurationProperties用于第三方组件的绑定，@ConfigurationProperties用于自己写的组件的绑定</p>
+<h2 id="总结">总结</h2>
+<p>导入starter &ndash;&gt; 生效一系列的xxxAutoConfiguration自动配置类 &ndash;&gt; 在容器中注册很多组件 &ndash;&gt; 组件参数绑定在xxxProperties属性类中 &ndash;&gt; 关联配置文件
+|                                                         |
+使用Autowired自动装配                                           配置属性</p>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>

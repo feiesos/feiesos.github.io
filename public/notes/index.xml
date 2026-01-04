@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Notes on Feiesos&#39; blog</title>
+    <link>http://localhost:1313/notes/</link>
+    <description>Recent content in Notes on Feiesos&#39; blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 26 Dec 2025 21:23:39 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>计算机操作系统</title>
+      <link>http://localhost:1313/notes/second/</link>
+      <pubDate>Fri, 26 Dec 2025 21:23:39 +0800</pubDate>
+      <guid>http://localhost:1313/notes/second/</guid>
+      <description>&lt;p&gt;&amp;hellip;&lt;/p&gt;&#xA;&lt;h1 id=&#34;进程的描述与控制&#34;&gt;进程的描述与控制&lt;/h1&gt;&#xA;&lt;p&gt;&amp;hellip;&lt;/p&gt;&#xA;&lt;h2 id=&#34;进程的描述&#34;&gt;进程的描述&lt;/h2&gt;&#xA;&lt;h3 id=&#34;进程的定义与特征&#34;&gt;进程的定义与特征&lt;/h3&gt;&#xA;&lt;p&gt;传统OS中进程的定义：进程是程序的&lt;em&gt;执行过程&lt;/em&gt;，是系统进行&lt;em&gt;资源分配&lt;/em&gt;和&lt;em&gt;调度&lt;/em&gt;的一个&lt;strong&gt;独立单位&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;进程的四个特性：&#xA;- &lt;strong&gt;动态性&lt;/strong&gt;，最基本特性。进程的本质是程序的动态执行。&#xA;- &lt;strong&gt;并发性&lt;/strong&gt;，重要特性。进程的目的就是为了使进程和其他进程并发执行。&#xA;- &lt;strong&gt;独立性&lt;/strong&gt;。晋城市独立运行、独立获得资源、独立接受调度的基本单位。&#xA;- &lt;strong&gt;异步性&lt;/strong&gt;。进程是并发结果可再现的基础，为并发结果的再现提供了可能。&lt;/p&gt;&#xA;&lt;h3 id=&#34;进程的基本状态与转换&#34;&gt;进程的基本状态与转换&lt;/h3&gt;&#xA;&lt;p&gt;进程的五种&lt;strong&gt;基本状态&lt;/strong&gt;：&#xA;1. 就绪态，进程已分配好除CPU外的所有资源。&#xA;2. 执行态，进程正在执行。&#xA;3. 阻塞态，进程由于某些事件的发生被阻塞，这时会发生进程调度。&#xA;4. 创建状态。引入创建状态是为了保证进程的调度必须在创建工作完成后进行。&#xA;5. 终止状态。&lt;/p&gt;&#xA;&lt;p&gt;进程状态间的转换图：&#xA;&lt;img src=&#34;image.png&#34; alt=&#34;进程状态间的转换图&#34;&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;挂起操作和进程状态的转换&#34;&gt;挂起操作和进程状态的转换&lt;/h3&gt;&#xA;&lt;p&gt;挂起是操作系统为了满足系统和用户观察与分析进程的需要而引入的，是三个基本状态之外的、面向进程的重要操作。&lt;/p&gt;&#xA;&lt;p&gt;挂起操作主要是为了满足以下需要：&#xA;1. 终端用户的需要：终端用户希望能够暂停运行中的程序，以便研究执行情况或对其进行修改等。&#xA;2. 父进程的需要：父进程有时需要挂起自己的某个子进程，以便考察和修改该紫禁城，或者协调各个进程间的活动。&#xA;3. 负荷调节的需要：当实时系统中工作负荷较重，系统为保证自身能正常运行，可能把一些不重要的进程挂起。&#xA;4. OS的需要：OS有时希望挂起某些进程，以便检查在进程运行过程中资源的使用情况或者进行记账（CPU时间、实际使用时间、作业或进程数量等）。&lt;/p&gt;&#xA;&lt;p&gt;引入挂起操作后进程3个基本状态间的转换：&#xA;挂起原语Suspend和激活源于Active（成对使用）的共同作用下，进程可能发生这些状态转换。&#xA;1. 活动就绪 -&amp;gt; 静止就绪&#xA;2. 活动阻塞 -&amp;gt; 静止阻塞&#xA;3. 静止就绪 -&amp;gt; 活动就绪&#xA;4. 静止阻塞 -&amp;gt; 活动阻塞&#xA;引入创建和终止状态后，还需补充&#xA;1. NULL -&amp;gt; 创建&#xA;2. 创建 -&amp;gt; 活动就绪&#xA;3. 创建 -&amp;gt; 静止就绪&#xA;4. 执行 -&amp;gt; 终止&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

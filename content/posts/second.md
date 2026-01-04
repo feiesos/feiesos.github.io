@@ -4,7 +4,7 @@ draft = false
 title = 'Netdisk项目技术说明（面向实现）'
 toc = true
 tocBorder = true
-tags = ["technical-documentation", "object-storage", "Spring Boot", "MinIO", "Kafka"]
+tags = ["项目说明", "对象存储", "Spring Boot", "MinIO", "Kafka"]
 +++
 ## 技术栈（固定约定）
 

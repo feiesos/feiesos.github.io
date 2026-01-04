@@ -3,8 +3,7 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <meta name="description" content="创建和启动Demo
-创建项目
+   <meta name="description" content="创建项目
 打开IDEA，选择Spring Boot项目生成器创建一个SpringBoot项目。
 
 填写项目基本信息；
@@ -94,14 +93,27 @@ Process finished with exit code 0
         <aside  class="toc" >
             <nav id="TableOfContents">
   <ul>
-    <li><a href="#创建和启动demo">创建和启动Demo</a>
+    <li><a href="#创建项目">创建项目</a></li>
+    <li><a href="#项目准备">项目准备</a>
       <ul>
-        <li><a href="#创建项目">创建项目</a></li>
-        <li><a href="#项目准备">项目准备</a></li>
-        <li><a href="#启动项目">启动项目</a></li>
-        <li><a href="#引入spring-mvc依赖">引入Spring Mvc依赖</a></li>
-        <li><a href="#为hello方法添加请求映射注解">为hello方法添加请求映射注解</a></li>
-        <li><a href="#应用配置文件">应用配置文件</a></li>
+        <li><a href="#配置镜像">配置镜像</a></li>
+        <li><a href="#配置代理">配置代理</a></li>
+      </ul>
+    </li>
+    <li><a href="#启动项目">启动项目</a></li>
+    <li><a href="#引入spring-mvc依赖">引入Spring Mvc依赖</a></li>
+    <li><a href="#为hello方法添加请求映射注解">为hello方法添加请求映射注解</a>
+      <ul>
+        <li><a href="#什么是注解">什么是注解？</a></li>
+        <li><a href="#为什么要注解">为什么要注解？</a></li>
+        <li><a href="#注解的分类">注解的分类</a></li>
+      </ul>
+    </li>
+    <li><a href="#应用配置文件">应用配置文件</a>
+      <ul>
+        <li><a href="#修改服务端口">修改服务端口</a></li>
+        <li><a href="#设置根路径">设置根路径</a></li>
+        <li><a href="#补充介绍">补充介绍</a></li>
       </ul>
     </li>
   </ul>
@@ -109,17 +121,16 @@ Process finished with exit code 0
         </aside>
     
 
-    <h2 id="创建和启动demo">创建和启动Demo</h2>
-<h3 id="创建项目">创建项目</h3>
+    <h2 id="创建项目">创建项目</h2>
 <p>打开IDEA，选择<strong>Spring Boot</strong>项目生成器创建一个SpringBoot项目。</p>
 <ol>
 <li>填写项目基本信息；</li>
 <li>我们选择Java语言、Maven作为依赖管理和项目构建工具，打包方式为Jar；</li>
 <li>点击下一步。这里IDEA可为我们自动导入依赖，可以先不选，用到时手动配置即可。</li>
 </ol>
-<h3 id="项目准备">项目准备</h3>
+<h2 id="项目准备">项目准备</h2>
 <p>等待Maven以及其他依赖引入，由于仓库不再国内，我们可以选择配置镜像或者代理的方式加速。</p>
-<h4 id="配置镜像">配置镜像</h4>
+<h3 id="配置镜像">配置镜像</h3>
 <ol>
 <li>打开Maven的配置文件<code>setting.xml</code>；</li>
 <li>添加</li>
@@ -135,7 +146,7 @@ Process finished with exit code 0
 </span></span></code></pre></div><ol start="3">
 <li>这样就配置好了aliyun镜像，接着保存即可。</li>
 </ol>
-<h4 id="配置代理">配置代理</h4>
+<h3 id="配置代理">配置代理</h3>
 <p>或者，如果你有代理，可以通过配置代理的方式加速依赖引入。</p>
 <ol>
 <li>打开IDEA设置，选择<code>Appearance &amp; Behavior</code> - <code>System Settings</code> - <code>Http Proxy</code>；</li>
@@ -143,7 +154,7 @@ Process finished with exit code 0
 <li>填写<code>Host name</code>和<code>Port number</code>。如果你有需要，填写其他字段；</li>
 <li>点击OK保存。</li>
 </ol>
-<h3 id="启动项目">启动项目</h3>
+<h2 id="启动项目">启动项目</h2>
 <p>依赖引入完成，接着我们尝试第一次启动项目。</p>
 <ol>
 <li>首先，我们打开<code>src/main/java/com.example.demo/DemoAplication.java</code>，当然这里的包名和类名应与你创建时的一致；</li>
@@ -177,7 +188,7 @@ Process finished with exit code 0
 <li>我们重新启动项目。
 通过Console中的日志我们发现项目启动成功。不过我们无法通过浏览器访问hello方法，因为没有Web容器。</li>
 </ol>
-<h3 id="引入spring-mvc依赖">引入Spring Mvc依赖</h3>
+<h2 id="引入spring-mvc依赖">引入Spring Mvc依赖</h2>
 <p>为引入Tomcat（web容器），我们手动配置spring mvc依赖。</p>
 <ol>
 <li>在<code>pom.xml</code>中的<code>&lt;dependencies&gt;&lt;/dependencies&gt;</code>标签中，添加</li>
@@ -189,20 +200,20 @@ Process finished with exit code 0
 </span></span></code></pre></div><ol start="2">
 <li>然后同步Maven即可。</li>
 </ol>
-<h3 id="为hello方法添加请求映射注解">为hello方法添加请求映射注解</h3>
+<h2 id="为hello方法添加请求映射注解">为hello方法添加请求映射注解</h2>
 <p>再开始之前，我们先来了解一下<strong>注解</strong>。</p>
-<h4 id="什么是注解">什么是注解？</h4>
+<h3 id="什么是注解">什么是注解？</h3>
 <p>注解是一种为程序元素（如类、方法、变量等）添加元数据的机制。它并不会影响程序的运行，而是为编译器、开发工具和运行时提供信息。</p>
 <p>简单说，注解就是贴在代码上的“说明标签”，告诉Java或者框架如何处理这段代码。</p>
 <p>比如我们将要用到的<code>@RestController</code>注解，就是告诉Spring：“这个类是个控制器，方法需要你转成JSON”。</p>
-<h4 id="为什么要注解">为什么要注解？</h4>
+<h3 id="为什么要注解">为什么要注解？</h3>
 <ol>
 <li>注解能够减少重复代码，提升代码可读性；</li>
 <li>注解作为XML配置方式的一种替代，提供了更简单、直观的配置方法；</li>
 <li>注解能够让框架自动处理很多东西。</li>
 </ol>
 <p>总之，注解是种强大的工具，合理使用注解可以提升代码可读性、可维护性和自动化程度。</p>
-<h4 id="注解的分类">注解的分类</h4>
+<h3 id="注解的分类">注解的分类</h3>
 <p>在Java中注解分三类，</p>
 <ol>
 <li>编译时使用的注解，这将在编译时让编译器检查。<br>
@@ -231,18 +242,18 @@ Process finished with exit code 0
 <p>服务默认启动在8080端口，在浏览器地址栏输入<a href="http://localhost:8080/hello"><code>localhost:8080/hello</code></a>来访问hello方法。</p>
 <p>如果我们看到“Hello World”，说明配置成功。浏览器通过GET请求访问hello方法，@RestController注解将返回值直接写入HTTP响应体，通常是JSON，但由于方法的返回值是字符串，会直接返回字符串并响应给浏览器。</p>
 <p>我们也可以给DemoApplication类加上@RequestMapping注解，比如设为@RequestMapping(&quot;/index&quot;)，这样做后，请求hello资源的路径不再是/hello，而是/index/hello。简单起见，本例中我们暂不添加。</p>
-<h3 id="应用配置文件">应用配置文件</h3>
-<h4 id="修改服务端口">修改服务端口</h4>
+<h2 id="应用配置文件">应用配置文件</h2>
+<h3 id="修改服务端口">修改服务端口</h3>
 <p>刚才我们提到了服务默认启动端口，Spring Mvc集成了Tomcat，而Tomcat默认启动在8080。</p>
 <p>我们可以通过编辑<code>src/main/resources/application.properties</code>来修改，只需添加</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">server.port</span><span style="color:#f92672">=</span><span style="color:#e6db74">7891</span>
 </span></span></code></pre></div><p>即可。</p>
-<h4 id="设置根路径">设置根路径</h4>
+<h3 id="设置根路径">设置根路径</h3>
 <p>添加<code>server.servlet.context-path</code>属性来为当前应用添加根路径。</p>
 <p>比如</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">server.servlet.context-path</span><span style="color:#f92672">=</span><span style="color:#e6db74">/api</span>
 </span></span></code></pre></div><p>这样访问hello路径变为了localhost:7891/api/hello（我们刚刚也改了端口）。</p>
-<h4 id="补充介绍">补充介绍</h4>
+<h3 id="补充介绍">补充介绍</h3>
 <p>application.properties是Spring Boot的核心配置文件，用于配置应用程序的各种参数。Spring Boot也支持application.yml格式。</p>
 <p>Spring Boot将按照以下顺序加载配置文件：</p>
 <ol>

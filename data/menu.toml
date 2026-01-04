@@ -7,12 +7,12 @@ title = "all posts"
   show_more_text = "See archive..."
   show_more_url = "posts"
 
-[[entries]]
-title = "posts by category"
+# [[entries]]
+# title = "posts by category"
 
-  [entries.post_list]
-  section = "posts"
-  limit = 4
-  show_more = true
-  show_more_text = "See more posts..."
-  show_more_url = "posts"
+#   [entries.post_list]
+#   section = "posts"
+#   limit = 4
+#   show_more = true
+#   show_more_text = "See more posts..."
+#   show_more_url = "posts"

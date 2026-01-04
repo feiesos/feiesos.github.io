@@ -7,17 +7,16 @@ tocBorder = true
 tags = ["Spring Boot", "Tutorial"]
 +++
 
-## 创建和启动Demo
-### 创建项目
+## 创建项目
 打开IDEA，选择**Spring Boot**项目生成器创建一个SpringBoot项目。
 1. 填写项目基本信息；
 2. 我们选择Java语言、Maven作为依赖管理和项目构建工具，打包方式为Jar；
 3. 点击下一步。这里IDEA可为我们自动导入依赖，可以先不选，用到时手动配置即可。
 
-### 项目准备
+## 项目准备
 等待Maven以及其他依赖引入，由于仓库不再国内，我们可以选择配置镜像或者代理的方式加速。
 
-#### 配置镜像
+### 配置镜像
 1. 打开Maven的配置文件`setting.xml`；
 2. 添加
 ``` xml
@@ -32,14 +31,14 @@ tags = ["Spring Boot", "Tutorial"]
 ```
 3. 这样就配置好了aliyun镜像，接着保存即可。
 
-#### 配置代理
+### 配置代理
 或者，如果你有代理，可以通过配置代理的方式加速依赖引入。
 1. 打开IDEA设置，选择`Appearance & Behavior` - `System Settings` - `Http Proxy`；
 2. 选择`Manual proxy configuration`并根据你的代理选择**HTTP**或者**SOCKS**协议；
 3. 填写`Host name`和`Port number`。如果你有需要，填写其他字段；
 4. 点击OK保存。
 
-### 启动项目
+## 启动项目
 依赖引入完成，接着我们尝试第一次启动项目。
 1. 首先，我们打开`src/main/java/com.example.demo/DemoAplication.java`，当然这里的包名和类名应与你创建时的一致；
 2. 接着，使用`Shift` + `F10`运行项目。
@@ -73,7 +72,7 @@ public String hello() {
 3. 我们重新启动项目。
 通过Console中的日志我们发现项目启动成功。不过我们无法通过浏览器访问hello方法，因为没有Web容器。
 
-### 引入Spring Mvc依赖
+## 引入Spring Mvc依赖
 为引入Tomcat（web容器），我们手动配置spring mvc依赖。
 1. 在`pom.xml`中的`<dependencies></dependencies>`标签中，添加
 ```xml
@@ -84,24 +83,24 @@ public String hello() {
 ```
 2. 然后同步Maven即可。
 
-### 为hello方法添加请求映射注解
+## 为hello方法添加请求映射注解
 再开始之前，我们先来了解一下**注解**。
 
-#### 什么是注解？
+### 什么是注解？
 注解是一种为程序元素（如类、方法、变量等）添加元数据的机制。它并不会影响程序的运行，而是为编译器、开发工具和运行时提供信息。
 
 简单说，注解就是贴在代码上的“说明标签”，告诉Java或者框架如何处理这段代码。
 
 比如我们将要用到的`@RestController`注解，就是告诉Spring：“这个类是个控制器，方法需要你转成JSON”。
 
-#### 为什么要注解？
+### 为什么要注解？
 1. 注解能够减少重复代码，提升代码可读性；
 2. 注解作为XML配置方式的一种替代，提供了更简单、直观的配置方法；
 3. 注解能够让框架自动处理很多东西。
 
 总之，注解是种强大的工具，合理使用注解可以提升代码可读性、可维护性和自动化程度。
 
-#### 注解的分类
+### 注解的分类
 在Java中注解分三类，
 1. 编译时使用的注解，这将在编译时让编译器检查。\
     比如@Override，这告诉编译器这个方法覆盖了父类方法，否则报错。
@@ -134,8 +133,8 @@ public String hello() {
 
 我们也可以给DemoApplication类加上@RequestMapping注解，比如设为@RequestMapping("/index")，这样做后，请求hello资源的路径不再是/hello，而是/index/hello。简单起见，本例中我们暂不添加。
 
-### 应用配置文件
-#### 修改服务端口
+## 应用配置文件
+### 修改服务端口
 刚才我们提到了服务默认启动端口，Spring Mvc集成了Tomcat，而Tomcat默认启动在8080。
 
 我们可以通过编辑`src/main/resources/application.properties`来修改，只需添加
@@ -143,7 +142,7 @@ public String hello() {
 server.port=7891
 ```
 即可。
-#### 设置根路径
+### 设置根路径
 添加`server.servlet.context-path`属性来为当前应用添加根路径。
 
 比如
@@ -152,7 +151,7 @@ server.servlet.context-path=/api
 ```
 这样访问hello路径变为了localhost:7891/api/hello（我们刚刚也改了端口）。
 
-#### 补充介绍
+### 补充介绍
 application.properties是Spring Boot的核心配置文件，用于配置应用程序的各种参数。Spring Boot也支持application.yml格式。
 
 Spring Boot将按照以下顺序加载配置文件：

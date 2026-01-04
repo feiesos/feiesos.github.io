@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="在分布式系统中，雪花算法(Snowflake)是生成唯一分布式ID的常用方案。
+然而，在基于Spring Boot的后端与前端（通常是JavaScript/Vue/React）进行数据交互时，开发者经常会发现，比如：
+
+后端返回的ID是1234567890123456789，但前端接收到的却是1234567890123456800。
+
+这种“最后几位变0”或“数值偏移”的现象，就是经典的大整数精度损失问题。
+
+问题的根源在哪里？
+问题的本质不在于网络传输，也不在于数据库存储，而在于Java的Long类型与JavaScript的Number类型对64位宽度的处理逻辑不同。
+后端：Long(64-bit 有符号整数)在Java中，long类型占用8个字节（64 位），其取值范围是：$$[-2^{63}, 2^{63} - 1]$$即最大值为 9,223,372,036,854,775,807（19 位数字）。
+前端：Number(64-bit 浮点数)JavaScript不区分整型和浮点型，所有数字统一使用IEEE-754标准的双精度浮点数(Double Precision)存储。
+在一个64位的双精度浮点数中，其结构如下：
+
+符号位 (Sign): 1 bit
+指数位 (Exponent): 11 bits
+尾数位 (Mantissa/Fraction): 52 bits
+
+精度冲突
+由于只有52位用于存储尾数（有效数字），JavaScript 能够精确表示的最大整数（即安全整数 Number.MAX_SAFE_INTEGER）是：
+$$
+2^{53} - 1 = 9,007,199,254,740,991
+$$
+这是一个 16 位的数字，而雪花算法生成的 ID 通常是 19 位的。
+结论： 当后端返回的ID超过 $2^{53}-1$ 时，前端在用**JSON.parse()**解析JSON字符串时，会尝试将其转换为Number类型。由于超出了尾数的承载能力，低位信息会被舍入，从而导致精度丢失。
+
+解决办法
+要解决这个问题，最核心的思路是：在数据离开后端进入JSON序列化阶段时，将Long强制转为String。
+方案一：使用 @JsonSerialize 注解（局部处理）
+如果你只想针对某个实体类中的特定字段进行转换，可以在字段上加上Jackson的注解。
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
+
+@Data
+public class UserVO {
+    // 使用 ToStringSerializer 将 Long 序列化为 String
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
+    
+    private String name;
+}
+方案二：配置全局 Jackson 转换器（推荐）
+如果项目中大量使用了雪花ID，给每个字段加注解太麻烦。你可以通过配置Spring Boot的ObjectMapper，全局将Long类型统一序列化为String。">  
+
+  <title>
+    
+      雪花算法在前后端传递的精度损失问题与解决办法
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+   <script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$','$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+
+  window.addEventListener('load', (event) => {
+      document.querySelectorAll("mjx-container").forEach(function(x){
+        x.parentElement.classList += 'has-jax'})
+    });
+
+</script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+ 
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+                <div class="post-meta">
+                    <a href="/">..</a>
+
+                    <p>
+                        <time datetime="2025-12-22 15:48:23 &#43;0800 CST">
+                            2025-12-22
+                        </time>
+                    </p>
+                </div>
+
+<article>
+    <h1>雪花算法在前后端传递的精度损失问题与解决办法</h1>
+
+    
+
+    <p>在分布式系统中，雪花算法(Snowflake)是生成唯一分布式ID的常用方案。</p>
+<p>然而，在基于Spring Boot的后端与前端（通常是JavaScript/Vue/React）进行数据交互时，开发者经常会发现，比如：</p>
+<ul>
+<li>后端返回的ID是1234567890123456789，但前端接收到的却是1234567890123456800。</li>
+</ul>
+<p>这种“<em>最后几位变0</em>”或“<em>数值偏移</em>”的现象，就是经典的<strong>大整数精度损失</strong>问题。</p>
+<hr>
+<h2 id="问题的根源在哪里">问题的根源在哪里？</h2>
+<p>问题的本质不在于网络传输，也不在于数据库存储，而在于Java的<strong>Long</strong>类型与JavaScript的<strong>Number</strong>类型对64位宽度的处理逻辑不同。</p>
+<p><strong>后端</strong>：Long(64-bit 有符号整数)在Java中，long类型占用8个字节（64 位），其取值范围是：$$[-2^{63}, 2^{63} - 1]$$即最大值为 9,223,372,036,854,775,807（19 位数字）。</p>
+<p><strong>前端</strong>：Number(64-bit 浮点数)JavaScript不区分整型和浮点型，所有数字统一使用IEEE-754标准的双精度浮点数(Double Precision)存储。</p>
+<p>在一个64位的双精度浮点数中，其结构如下：</p>
+<ul>
+<li>符号位 (Sign): 1 bit</li>
+<li>指数位 (Exponent): 11 bits</li>
+<li>尾数位 (Mantissa/Fraction): 52 bits</li>
+</ul>
+<h3 id="精度冲突">精度冲突</h3>
+<p>由于只有52位用于存储尾数（有效数字），JavaScript 能够精确表示的最大整数（即安全整数 Number.MAX_SAFE_INTEGER）是：</p>
+<p>$$
+2^{53} - 1 = 9,007,199,254,740,991
+$$</p>
+<p>这是一个 16 位的数字，而雪花算法生成的 ID 通常是 19 位的。</p>
+<p><strong>结论</strong>： 当后端返回的ID超过 $2^{53}-1$ 时，前端在用**JSON.parse()**解析JSON字符串时，会尝试将其转换为Number类型。由于超出了尾数的承载能力，低位信息会被舍入，从而导致精度丢失。</p>
+<hr>
+<h2 id="解决办法">解决办法</h2>
+<p>要解决这个问题，最核心的思路是：在数据离开后端进入JSON序列化阶段时，将Long强制转为String。</p>
+<h3 id="方案一使用-jsonserialize-注解局部处理">方案一：使用 @JsonSerialize 注解（局部处理）</h3>
+<p>如果你只想针对某个实体类中的特定字段进行转换，可以在字段上加上Jackson的注解。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Java" data-lang="Java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.fasterxml.jackson.databind.annotation.JsonSerialize;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> lombok.Data;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Data</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserVO</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 使用 ToStringSerializer 将 Long 序列化为 String</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonSerialize</span>(using <span style="color:#f92672">=</span> ToStringSerializer.<span style="color:#a6e22e">class</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Long id;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方案二配置全局-jackson-转换器推荐">方案二：配置全局 Jackson 转换器（推荐）</h3>
+<p>如果项目中大量使用了雪花ID，给每个字段加注解太麻烦。你可以通过配置Spring Boot的ObjectMapper，全局将Long类型统一序列化为String。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Java" data-lang="Java"><span style="display:flex;"><span><span style="color:#a6e22e">@Configuration</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">JacksonConfig</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Bean</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Jackson2ObjectMapperBuilderCustomizer <span style="color:#a6e22e">jackson2ObjectMapperBuilderCustomizer</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> builder <span style="color:#f92672">-&gt;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 将 Long 类型（及其包装类）序列化为 String</span>
+</span></span><span style="display:flex;"><span>            builder.<span style="color:#a6e22e">serializerByType</span>(Long.<span style="color:#a6e22e">class</span>, ToStringSerializer.<span style="color:#a6e22e">instance</span>);
+</span></span><span style="display:flex;"><span>            builder.<span style="color:#a6e22e">serializerByType</span>(Long.<span style="color:#a6e22e">TYPE</span>, ToStringSerializer.<span style="color:#a6e22e">instance</span>);
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 如果你也用 BigInteger，建议一并处理</span>
+</span></span><span style="display:flex;"><span>            builder.<span style="color:#a6e22e">serializerByType</span>(BigInteger.<span style="color:#a6e22e">class</span>, ToStringSerializer.<span style="color:#a6e22e">instance</span>);
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>注意：此配置生效后，所有接口返回的 Long 都会变成 String。</p>
+<p>对于普通的小整数（如年龄、状态值），前端JS依然能透明地进行数学运算（&ldquo;18&rdquo; * 1 = 18），所以副作用极小。</p>
+<h3 id="方案三使用-jsonformat">方案三：使用 @JsonFormat</h3>
+<p>解决@JsonFormat 也可以实现类似效果，将类型强制指定为<code>Shape.STRING</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Java" data-lang="Java"><span style="display:flex;"><span><span style="color:#a6e22e">@JsonFormat</span>(shape <span style="color:#f92672">=</span> JsonFormat.<span style="color:#a6e22e">Shape</span>.<span style="color:#a6e22e">STRING</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Long id;
+</span></span></code></pre></div><hr>
+<h2 id="进阶探讨前端如何处理">进阶探讨：前端如何处理？</h2>
+<p>如果在某些极端情况下，后端必须返回原始数字格式（虽然不推荐），前端可以使用<strong>json-bigint</strong>等第三方库来替代原生的JSON.parse。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Java" data-lang="Java"><span style="display:flex;"><span>Scriptimport JSONbig from <span style="color:#960050;background-color:#1e0010">&#39;</span>json<span style="color:#f92672">-</span>bigint<span style="color:#960050;background-color:#1e0010">&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 这样解析出来的结果会将大数包装成 BigNumber 对象，不会丢失精度</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> result <span style="color:#f92672">=</span> JSONbig.<span style="color:#a6e22e">parse</span>(jsonString);
+</span></span><span style="display:flex;"><span>console.<span style="color:#a6e22e">log</span>(result.<span style="color:#a6e22e">id</span>.<span style="color:#a6e22e">toString</span>());
+</span></span></code></pre></div>
+</article>
+
+            </div>
+        </main>
+    </body></html>
