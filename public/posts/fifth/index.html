@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="错误代码0x80070005
+当系统或用户在 Windows 更新时缺少更改设置所需的必要文件或权限时，会发生错误 0x80070005。
+以下是一些可能解决此问题的故障排除方法。
+解决方案1：
+检查 Windows 系统中是否存在损坏的文件。
+
+
+右键单击“开始”菜单，然后单击“Windows PowerShell（管理员）”。
+
+
+输入以下命令：
+sfc /scannow（并按 Enter 键）
+Dism /Online /Cleanup-Image /ScanHealth（并按 Enter 键）
+Dism /Online /Cleanup-Image /CheckHealth（并按 Enter 键）
+
+
+DISM 工具会报告映像是否健康、可修复或不可修复。如果映像可修复，您可以使用 /RestoreHealth（Dism /Online /Cleanup-Image /RestoreHealth）参数来修复映像。
+
+
+解决方案 2：
+可能是更新文件本身出了问题。清除存储所有更新文件的文件夹将强制 Windows 更新下载新文件。
+以下是如何清除更新数据库缓存，并将 Windows 更新组件重置为默认设置的方法。
+
+按 Windows &#43; R 键，输入 services.msc，然后单击“确定”打开 Windows 服务。
+向下滚动并找到 Windows 更新服务。
+右键单击该服务，然后选择“停止”。
+对**BITS（后台智能传输服务）和Superfetch（Superfetch 现已更名为 Sysmain）**执行相同的操作，右键单击并选择“停止”。
+现在转到以下位置：C:\Windows\SoftwareDistribution\Download。
+删除 download 文件夹中的所有内容，但不要删除文件夹本身。
+要删除文件夹，请按 Ctrl &#43; A 选择所有文件，然后按 Delete 键删除文件。
+再次打开 Windows 服务，然后重新启动之前停止的服务（Windows 更新、BITS）。
+重启计算机并重试。
+
+解决方案 3：
+重新安装 Microsoft Store。">  
+
+  <title>
+    
+      wsl安装发行版遇到0x80070005错误
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+                <div class="post-meta">
+                    <a href="/">..</a>
+
+                    <p>
+                        <time datetime="2026-01-07 15:15:47 &#43;0800 CST">
+                            2026-01-07
+                        </time>
+                    </p>
+                </div>
+
+<article>
+    <h1>wsl安装发行版遇到0x80070005错误</h1>
+
+    
+
+    <h2 id="错误代码0x80070005">错误代码0x80070005</h2>
+<p>当系统或用户在 Windows 更新时缺少更改设置所需的必要文件或权限时，会发生错误 0x80070005。</p>
+<p>以下是一些可能解决此问题的故障排除方法。</p>
+<p>解决方案1：
+检查 Windows 系统中是否存在损坏的文件。</p>
+<ol>
+<li>
+<p>右键单击“开始”菜单，然后单击“Windows PowerShell（管理员）”。</p>
+</li>
+<li>
+<p>输入以下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>sfc /scannow（并按 Enter 键）
+</span></span><span style="display:flex;"><span>Dism /Online /Cleanup-Image /ScanHealth（并按 Enter 键）
+</span></span><span style="display:flex;"><span>Dism /Online /Cleanup-Image /CheckHealth（并按 Enter 键）
+</span></span></code></pre></div></li>
+<li>
+<p>DISM 工具会报告映像是否健康、可修复或不可修复。如果映像可修复，您可以使用 <code>/RestoreHealth（Dism /Online /Cleanup-Image /RestoreHealth）</code>参数来修复映像。</p>
+</li>
+</ol>
+<p>解决方案 2：
+可能是更新文件本身出了问题。清除存储所有更新文件的文件夹将强制 Windows 更新下载新文件。
+以下是如何清除更新数据库缓存，并将 Windows 更新组件重置为默认设置的方法。</p>
+<ol>
+<li>按 Windows + R 键，输入 services.msc，然后单击“确定”打开 Windows 服务。</li>
+<li>向下滚动并找到 Windows 更新服务。</li>
+<li>右键单击该服务，然后选择“停止”。</li>
+<li>对**BITS（后台智能传输服务）<strong>和</strong>Superfetch（Superfetch 现已更名为 Sysmain）**执行相同的操作，右键单击并选择“停止”。</li>
+<li>现在转到以下位置：<code>C:\Windows\SoftwareDistribution\Download</code>。</li>
+<li>删除 download 文件夹中的所有内容，但不要删除文件夹本身。
+要删除文件夹，请按 Ctrl + A 选择所有文件，然后按 Delete 键删除文件。
+再次打开 Windows 服务，然后重新启动之前停止的服务（Windows 更新、BITS）。</li>
+<li>重启计算机并重试。</li>
+</ol>
+<p>解决方案 3：
+重新安装 Microsoft Store。</p>
+<ol>
+<li>右键单击“开始”。</li>
+<li>单击“Windows PowerShell（管理员）”。</li>
+<li>输入：
+<code>Get-AppXPackage -allusers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register &quot;$($_.InstallLocation)\AppXManifest.xml&quot;</code>，然后按 Enter 键。</li>
+<li>重启电脑，然后尝试打开 Microsoft Store。</li>
+</ol>
+<p>解决方案 4：
+如果以上步骤均无法解决问题，您可以使用媒体创建工具执行修复升级。此过程将修复所有 Windows 文件。</p>
+<ol>
+<li>下载媒体创建工具：
+<code>https://go.microsoft.com/fwlink/?LinkId=691209</code></li>
+<li>运行该工具并选择“立即升级此电脑”</li>
+<li>选择“保留我的所有文件和应用”选项</li>
+<li>然后单击更新。</li>
+</ol>
+<p>参考：[https://learn.microsoft.com/en-us/answers/questions/1022056/error-0x80070005]</p>
+
+    
+    
+    
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    clientID: 'Ov23liutI7L71Kv4y4Qq',
+    clientSecret: 'afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2',
+    proxy: 'https://cors-server.vercel.app/github_access_token',
+    repo: 'https:\/\/github.com\/feiesos\/feiesos.github.io',
+    owner: 'feiesos',
+    admin: ['feiesos'],
+    id: location.pathname, 
+    distractionFreeMode: false 
+  });
+  (function() {
+    
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
+      return;
+    }
+    gitalk.render('gitalk-container');
+  })();
+</script>
+
+</article>
+
+            </div>
+        </main>
+    </body></html>
