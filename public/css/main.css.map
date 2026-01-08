@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "main.css",
-	"sourceRoot": "D:/Develop/Web/Blog",
+	"sourceRoot": "D:/Develop/Blog/feiesos.github.io",
 	"sources": [
 		"themes/nostyleplease/assets/css/main.scss"
 	],

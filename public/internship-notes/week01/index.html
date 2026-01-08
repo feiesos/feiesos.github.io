@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="规范
+Java编码规范
+编码风格
+
+代码风格
+
+使用4个空格代替Tab缩进
+控制单行代码长度不超过120字符，否则遵循一下原则换行：
+
+在逗号后换行
+在操作符前换行
+换行后缩进四个空格（方法调用链多缩进一层以区分）
+
+
+方法、类、代码块之间用1个空行隔开，连续空行不超过2行
+遵循K&amp;R风格（左大括号不单独成行）
+
+
+注释规范
+
+类、接口、枚举的注释必须包含类级Javadoc，说明功能、作者、创建日期
+
+比如@author xxx @data 2025-11-18
+
+
+方法必须包含Javadoc，说明入参、返回值、异常
+
+比如@param name 用户名 @return 是否存在 @throws NullPointerException 当name为null时
+
+
+复杂逻辑（如分支条件、算法步骤）需加单行注释，避免冗余注释
+
+
+
+命名规范
+
+基本原则
+
+命名需见名知意，不使用拼音，可使用国际通用缩写（如UserDTO）
+不使用单字母命名（局部循环变量除外），不使用_、$等特殊字符
+
+
+具体规则
+
+类/接口/枚举：使用 UpperCamelCase（大驼峰）
+方法/参数/局部变量：使用 lowerCamelCase（小驼峰）
+常量：使用全大写&#43;下划线分隔，如MAX_RETRY_COUNT
+
+注：常量指public static final修饰的字段
+
+
+包名：使用全小写，多级包用.分隔，不包含下划线，如com.company.user.service
+抽象类：
+
+以Abstract开头，如AbstractUserDAO
+接口不加前缀，如UserService而非IUserService
+
+
+异常类：以Exception结尾，如UserNotFoundException
+集合类：使用复数形式或明确包含 &ldquo;List/Map/Set&rdquo;，如userList、idToUserMap
+布尔变量：避免使用is前缀（POJO 类的布尔字段除外），推荐用hasXXX、canXXX、isXXX（如hasPermission、canEdit）
+
+
+
+常量与变量
+
+常量定义
+
+常量必须通过public static final修饰，集中定义在类的顶部（枚举类除外）
+不在接口中定义常量（接口仅用于定义方法契约）
+避免魔法值（未定义的常量），如if (type == 1)应改为if (type == ORDER_TYPE_NORMAL)
+跨类共享的常量需放在专门的常量类中（如CommonConstants），同类内部使用的常量直接定义在当前类
+
+
+变量使用
+
+成员变量需明确访问修饰符（private优先，避免public），必要时通过get/set方法访问
+局部变量作用域最小化，如仅在循环体内使用的变量不定义到循环体外
+基本类型与包装类型选择：
+
+局部变量、方法参数优先使用基本类型（int而非Integer）
+集合、POJO属性使用包装类型（允许null表示未赋值）
+
+
+不使用null初始化变量，未赋值的引用类型变量默认值为null
+
+
+
+集合处理
+
+初始化
+
+集合初始化时指定初始容量[如new ArrayList&lt;&gt;(10)]，避免频繁扩容（初始容量 = 预计元素数 / 负载因子 &#43; 1，HashMap 负载因子默认 0.75）
+不使用new ArrayList(10)[原始类型，需指定泛型new ArrayList(10)]
+
+
+遍历与操作
+
+遍历集合优先使用增强 for 循环[for (String s : list)]，需要索引时使用普通for循环
+不在foreach循环中修改集合（会抛出ConcurrentModificationException），如需修改使用迭代器（Iterator）的remove方法
+集合转数组使用toArray(T[])，如list.toArray(new String[0])，避免返回Object[]强转导致ClassCastException
+
+
+工具类
+
+创建空集合使用Collections.emptyList()/emptyMap()（不可变），或new ArrayList&lt;&gt;()（可变），不返回null
+集合判空用CollectionUtils.isEmpty(collection)（需引入commons-collections工具类），避免collection == null || collection.size() == 0
+集合拷贝使用new ArrayList&lt;&gt;(sourceList)而非手动循环添加
+
+
+
+控制语句
+
+
+分支语句">  
+
+  <title>
+    
+      Week01
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2026-01-08 11:19:29 &#43;0800 CST">
+            2026-01-08
+        </time>
+    </p>
+
+    <h1>Week01</h1>
+
+    
+        <aside  class="toc" >
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#java编码规范">Java编码规范</a>
+      <ul>
+        <li><a href="#编码风格">编码风格</a></li>
+        <li><a href="#命名规范">命名规范</a></li>
+        <li><a href="#常量与变量">常量与变量</a></li>
+        <li><a href="#集合处理">集合处理</a></li>
+        <li><a href="#控制语句">控制语句</a></li>
+        <li><a href="#异常处理">异常处理</a></li>
+        <li><a href="#面向对象规范">面向对象规范</a></li>
+        <li><a href="#并发处理">并发处理</a></li>
+        <li><a href="#其他规范">其他规范</a></li>
+      </ul>
+    </li>
+    <li><a href="#git分支策略规范">Git分支策略规范</a>
+      <ul>
+        <li><a href="#核心分支定义长期存在">核心分支定义（长期存在）</a></li>
+        <li><a href="#临时分支定义完成后删除">临时分支定义（完成后删除）</a></li>
+        <li><a href="#分支合并规则">分支合并规则</a></li>
+        <li><a href="#版本号规范语义化版本">版本号规范（语义化版本）</a></li>
+        <li><a href="#协作场景示例">协作场景示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#代码提交规范">代码提交规范</a>
+      <ul>
+        <li><a href="#提交信息格式">提交信息格式</a></li>
+        <li><a href="#核心字段说明">核心字段说明</a></li>
+        <li><a href="#禁止性规范">禁止性规范</a></li>
+        <li><a href="#提交记录示例">提交记录示例</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </aside>
+    
+
+    <h1 id="规范">规范</h1>
+<h2 id="java编码规范">Java编码规范</h2>
+<h3 id="编码风格">编码风格</h3>
+<ol>
+<li>代码风格
+<ul>
+<li>使用4个空格代替Tab缩进</li>
+<li>控制单行代码长度不超过120字符，否则遵循一下原则换行：
+<ul>
+<li>在逗号后换行</li>
+<li>在操作符前换行</li>
+<li>换行后缩进四个空格（方法调用链多缩进一层以区分）</li>
+</ul>
+</li>
+<li>方法、类、代码块之间用1个空行隔开，连续空行不超过2行</li>
+<li>遵循K&amp;R风格（左大括号不单独成行）</li>
+</ul>
+</li>
+<li>注释规范
+<ul>
+<li>类、接口、枚举的注释必须包含类级Javadoc，说明功能、作者、创建日期
+<blockquote>
+<p>比如@author xxx @data 2025-11-18</p>
+</blockquote>
+</li>
+<li>方法必须包含Javadoc，说明入参、返回值、异常
+<blockquote>
+<p>比如@param name 用户名 @return 是否存在 @throws NullPointerException 当name为null时</p>
+</blockquote>
+</li>
+<li>复杂逻辑（如分支条件、算法步骤）需加单行注释，避免冗余注释</li>
+</ul>
+</li>
+</ol>
+<h3 id="命名规范">命名规范</h3>
+<ol>
+<li>基本原则
+<ul>
+<li>命名需见名知意，不使用拼音，可使用国际通用缩写（如UserDTO）</li>
+<li>不使用单字母命名（局部循环变量除外），不使用<code>_</code>、<code>$</code>等特殊字符</li>
+</ul>
+</li>
+<li>具体规则
+<ul>
+<li>类/接口/枚举：使用 UpperCamelCase（大驼峰）</li>
+<li>方法/参数/局部变量：使用 lowerCamelCase（小驼峰）</li>
+<li>常量：使用全大写+下划线分隔，如MAX_RETRY_COUNT
+<blockquote>
+<p>注：常量指public static final修饰的字段</p>
+</blockquote>
+</li>
+<li>包名：使用全小写，多级包用<code>.</code>分隔，不包含下划线，如com.company.user.service</li>
+<li>抽象类：
+<ul>
+<li>以Abstract开头，如AbstractUserDAO</li>
+<li>接口不加前缀，如UserService而非IUserService</li>
+</ul>
+</li>
+<li>异常类：以Exception结尾，如UserNotFoundException</li>
+<li>集合类：使用复数形式或明确包含 &ldquo;List/Map/Set&rdquo;，如userList、idToUserMap</li>
+<li>布尔变量：避免使用is前缀（POJO 类的布尔字段除外），推荐用hasXXX、canXXX、isXXX（如hasPermission、canEdit）</li>
+</ul>
+</li>
+</ol>
+<h3 id="常量与变量">常量与变量</h3>
+<ol>
+<li>常量定义
+<ul>
+<li>常量必须通过<code>public static final</code>修饰，集中定义在类的顶部（枚举类除外）</li>
+<li>不在接口中定义常量（接口仅用于定义方法契约）</li>
+<li>避免<strong>魔法值</strong>（未定义的常量），如<code>if (type == 1)</code>应改为<code>if (type == ORDER_TYPE_NORMAL)</code></li>
+<li>跨类共享的常量需放在专门的常量类中（如CommonConstants），同类内部使用的常量直接定义在当前类</li>
+</ul>
+</li>
+<li>变量使用
+<ul>
+<li>成员变量需明确访问修饰符（private优先，避免public），必要时通过get/set方法访问</li>
+<li>局部变量作用域最小化，如仅在循环体内使用的变量不定义到循环体外</li>
+<li>基本类型与包装类型选择：
+<ul>
+<li>局部变量、方法参数优先使用<strong>基本类型</strong>（int而非Integer）</li>
+<li>集合、POJO属性使用<strong>包装类型</strong>（允许null表示未赋值）</li>
+</ul>
+</li>
+<li>不使用null初始化变量，未赋值的引用类型变量默认值为null</li>
+</ul>
+</li>
+</ol>
+<h3 id="集合处理">集合处理</h3>
+<ol>
+<li>初始化
+<ul>
+<li>集合初始化时指定初始容量[如new ArrayList&lt;&gt;(10)]，避免频繁扩容（初始容量 = 预计元素数 / 负载因子 + 1，HashMap 负载因子默认 0.75）</li>
+<li>不使用new ArrayList(10)[原始类型，需指定泛型new ArrayList<!-- raw HTML omitted -->(10)]</li>
+</ul>
+</li>
+<li>遍历与操作
+<ul>
+<li>遍历集合优先使用增强 for 循环[for (String s : list)]，需要索引时使用普通for循环</li>
+<li>不在<strong>foreach</strong>循环中修改集合（会抛出ConcurrentModificationException），如需修改使用迭代器（Iterator）的remove方法</li>
+<li>集合转数组使用toArray(T[])，如list.toArray(new String[0])，避免返回Object[]强转导致ClassCastException</li>
+</ul>
+</li>
+<li>工具类
+<ul>
+<li>创建空集合使用<code>Collections.emptyList()</code>/<code>emptyMap()</code>（不可变），或<code>new ArrayList&lt;&gt;()</code>（可变），不返回null</li>
+<li>集合判空用<code>CollectionUtils.isEmpty(collection)</code>（需引入<code>commons-collections</code>工具类），避免<code>collection == null || collection.size() == 0</code></li>
+<li>集合拷贝使用<code>new ArrayList&lt;&gt;(sourceList)</code>而非手动循环添加</li>
+</ul>
+</li>
+</ol>
+<h3 id="控制语句">控制语句</h3>
+<ol>
+<li>
+<p>分支语句</p>
+<ol>
+<li>if/else
+<ul>
+<li>条件表达式必须用括号包裹（如if (a &gt; b)，不if a &gt; b）</li>
+<li>多分支条件优先使用if-else if而非多个独立if（避免重复判断）</li>
+<li>复杂条件提取为布尔变量，如：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">boolean</span> isOverdue <span style="color:#f92672">=</span> endTime <span style="color:#f92672">&lt;</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (isOverdue) {
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>不在if后省略大括号（即使单行代码），如：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// 错误</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (flag) doSomething();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 正确</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (flag) {
+</span></span><span style="display:flex;"><span>    doSomething();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+</ul>
+</li>
+<li>switch/case
+<ul>
+<li>switch参数支持byte/short/int/char/String/enum，不使用 long/float/double</li>
+<li>每个case块必须以break/return结束，或注释说明穿透逻辑（如// fallthrough）</li>
+<li>必须包含default分支（即使为空，需注释说明）</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>循环语句</p>
+<ul>
+<li>避免死循环，循环条件需有明确退出机制</li>
+<li>不在循环内定义新对象，如：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (...) {
+</span></span><span style="display:flex;"><span>    String s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> String();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>应改为循环外定义</li>
+<li>多层循环嵌套不超过 3 层，超过时提取为方法</li>
+</ul>
+</li>
+</ol>
+<h3 id="异常处理">异常处理</h3>
+<ol>
+<li>异常抛出
+<ul>
+<li>方法抛出的异常必须在<strong>Javadoc</strong>中声明（@throws）</li>
+<li>不抛出Exception/Throwable等<strong>宽泛异常</strong>，应抛具体异常（如IOException而非Exception）</li>
+<li>不手动抛出NullPointerException，通过代码逻辑避免空指针（如提前判空）</li>
+<li>业务异常需自定义（继承RuntimeException），如UserNotExistException</li>
+</ul>
+</li>
+<li>异常捕获
+<ul>
+<li>try-catch块范围最小化，仅包裹可能抛出异常的代码</li>
+<li>不捕获异常后不处理（空catch块），至少打印日志（log.error(&ldquo;错误信息&rdquo;, e)）</li>
+<li>捕获异常时需先捕获子类异常，再捕获父类异常（如先catch (IOException)再catch (Exception)）</li>
+<li>不在finally块中使用return（会覆盖try/catch中的返回值）</li>
+</ul>
+</li>
+</ol>
+<h3 id="面向对象规范">面向对象规范</h3>
+<ol>
+<li>类设计
+<ul>
+<li>类名体现职责，一个类只做一件事（单一职责原则）</li>
+<li>POJO 类（实体类）属性必须私有，提供get/set方法，重写toString()（便于日志打印）</li>
+<li>工具类（如StringUtil）应私有构造方法（不实例化），所有方法静态</li>
+<li>不在类中定义public static可变字段[如<code>public static List&lt;String&gt; list = new ArrayList&lt;&gt;()</code>]</li>
+</ul>
+</li>
+<li>继承与实现
+<ul>
+<li>继承遵循&quot;is-a&quot;关系，重写方法时加@Override注解</li>
+<li>接口中只定义方法签名，不包含实现（默认方法default谨慎使用）</li>
+<li>抽象类中可包含抽象方法和具体方法，作为模板骨架</li>
+</ul>
+</li>
+<li>equals与hashCode
+<ul>
+<li>重写equals()必须同时重写hashCode()（否则HashMap等集合可能无法正常工作）</li>
+<li>equals()判断需避免空指针，推荐<code>Objects.equals(a, b)</code>而非a.equals(b)</li>
+<li>基本类型用==比较，引用类型用equals()（除String常量池比较外）</li>
+</ul>
+</li>
+</ol>
+<h3 id="并发处理">并发处理</h3>
+<ol>
+<li>线程安全
+<ul>
+<li>多线程环境下共享变量需加锁（synchronized或Lock），或使用线程安全类（如ConcurrentHashMap）</li>
+<li><code>synchronized</code>优先修饰方法或代码块（范围最小化），避免修饰整个类</li>
+<li>不在多线程中使用<code>SimpleDateFormat</code>（线程不安全），改用<code>DateTimeFormatter</code>（Java 8+）</li>
+</ul>
+</li>
+<li>线程池
+<ul>
+<li>不使用Executors创建线程池（默认参数可能导致 OOM），需手动创建<code>ThreadPoolExecutor</code>并指定核心参数</li>
+<li>线程池命名需包含业务标识（如orderProcessThreadPool），便于问题排查</li>
+<li>线程池使用后需调用<code>shutdown()</code>关闭，避免资源泄漏</li>
+</ul>
+</li>
+</ol>
+<h3 id="其他规范">其他规范</h3>
+<ol>
+<li>日志
+<ul>
+<li>日志级别使用：
+<ul>
+<li>error（错误，影响功能）</li>
+<li>warn（警告，不影响功能）</li>
+<li>info（重要业务节点）</li>
+<li>debug（调试信息，生产环境关闭）</li>
+</ul>
+</li>
+<li>日志打印需包含上下文信息（如用户ID、订单号），便于定位问题</li>
+<li>不使用System.out.println()，统一使用日志框架（如Logback、Log4j2）</li>
+</ul>
+</li>
+<li>工具依赖
+<ul>
+<li>字符串处理优先使用<code>StringUtils</code>（org.apache.commons.lang3），避免null判断</li>
+<li>日期处理使用Java 8+的<code>LocalDateTime</code>/<code>Instant</code>，替代<code>Date</code>/<code>Calendar</code></li>
+<li>集合操作使用<code>CollectionUtils</code>/<code>MapUtils</code>（commons-collections）简化判空和操作</li>
+</ul>
+</li>
+<li>代码提交
+<ul>
+<li>提交代码前需格式化（IDE自动格式化），通过静态检查工具（如SonarQube）扫描</li>
+<li>不提交调试代码（如System.out、TODO、注释掉的代码）</li>
+<li>代码注释需与逻辑同步更新，避免注释与代码不一致</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="git分支策略规范">Git分支策略规范</h2>
+<h3 id="核心分支定义长期存在">核心分支定义（长期存在）</h3>
+<ol>
+<li>master分支
+<ul>
+<li><strong>用途</strong>：存放正式发布的代码，始终保持可部署状态（生产环境代码来源）</li>
+<li><strong>权限</strong>：不直接提交，仅通过release或hotfix分支合并</li>
+<li><strong>保护机制</strong>：配置分支保护（如GitLab/GitHub中设置 “不强制推送”“需要代码审核才能合并”）</li>
+</ul>
+</li>
+<li>develop分支
+<ul>
+<li><strong>用途</strong>：开发主分支，集成已完成的功能，作为下一个版本的开发基线（测试环境代码来源）</li>
+<li><strong>权限</strong>：不直接提交，仅通过feature分支合并</li>
+<li><strong>特性</strong>：包含最新开发成果，保持相对稳定（可随时构建为测试版本）</li>
+</ul>
+</li>
+</ol>
+<h3 id="临时分支定义完成后删除">临时分支定义（完成后删除）</h3>
+<ol>
+<li>feature分支（功能分支）
+<ul>
+<li>用途：开发新功能、优化或非紧急 Bug 修复（基于develop分支创建）</li>
+<li>命名规范：feature/[issue编号]-[功能描述]（小写，用连字符分隔）示例：<code>feature/123-user-login</code>、<code>feature/456-order-optimize</code></li>
+<li>流程：
+<ul>
+<li>从develop分支checkout新分支：<code>git checkout -b feature/xxx develop</code></li>
+<li>开发完成后，提交Merge Request（MR）到develop分支</li>
+<li>需通过代码审核（至少1名团队成员Approve），通过后合并，删除该feature分支</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>release分支（发布分支）
+<ul>
+<li>用途：准备版本发布，仅修复发布前的minor bug（不开发新功能），基于develop分支创建</li>
+<li>命名规范：release/v[主版本].[次版本].[修订号]示例：<code>release/v1.2.0、release/v2.0.1</code></li>
+<li>流程：
+<ul>
+<li>当develop集成的功能满足发布条件时，从develop分支创建：<code>git checkout -b release/vx.y.z develop</code></li>
+<li>仅修复测试中发现的Bug，修复后同步到develop分支（避免遗漏）</li>
+<li>发布完成后，合并到master分支（并打Tag）和develop分支，删除该release分支</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>hotfix分支（紧急修复分支）
+<ul>
+<li>用途：修复生产环境（master 分支）出现的紧急Bug，基于master分支创建</li>
+<li>命名规范：hotfix/[issue编号]-[bug描述] 或 hotfix/v[主版本].[次版本].[修订号]示例：<code>hotfix/789-login-error、hotfix/v1.1.1</code></li>
+<li>流程：
+<ul>
+<li>从master分支checkout新分支：<code>git checkout -b hotfix/xxx master</code></li>
+<li>修复完成后，提交MR到master分支（发布修复版本）和develop分支（同步修复到开发主线）</li>
+<li>合并后，删除该hotfix分支</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="分支合并规则">分支合并规则</h3>
+<ol>
+<li><strong>不直接推送</strong>：master、develop 分支不允许直接<code>git push</code>，必须通过MR合并</li>
+<li><strong>代码审核</strong>：所有MR需经过至少1名团队成员审核（重点检查逻辑、风格、测试覆盖）</li>
+<li><strong>冲突处理</strong>：合并前需在本地解决分支冲突（<code>git pull --rebase</code>优先，避免冗余合并提交）</li>
+<li><strong>自动化校验</strong>：MR触发CI流程（如单元测试、代码规范检查、构建验证），全部通过才能合并</li>
+</ol>
+<h3 id="版本号规范语义化版本">版本号规范（语义化版本）</h3>
+<p>遵循 主版本号.次版本号.修订号（如 v1.2.3）：</p>
+<ul>
+<li><strong>主版本号（X）</strong>：不兼容的API变更（如架构重构），X.0.0</li>
+<li><strong>次版本号（Y）</strong>：向后兼容的功能新增，1.Y.0</li>
+<li><strong>修订号（Z）</strong>：向后兼容的问题修复（含hotfix），1.2.Z</li>
+<li><strong>Tag标记</strong>：合并到master分支后，必须打Tag标记版本：<code>git tag -a v1.2.0 -m &quot;Release v1.2.0&quot;</code>，并推送Tag到远程</li>
+</ul>
+<h3 id="协作场景示例">协作场景示例</h3>
+<ol>
+<li>新功能开发：develop → feature/xxx（开发）→ MR合并到develop</li>
+<li>版本发布：develop → release/vx.y.z（测试修复）→ 合并到 master（打Tag）和develop</li>
+<li>生产Bug修复：master → hotfix/xxx（修复）→ 合并到master（打Tag）和develop</li>
+</ol>
+<hr>
+<h2 id="代码提交规范">代码提交规范</h2>
+<h3 id="提交信息格式">提交信息格式</h3>
+<p>每次提交需包含<strong>类型（type）、范围（scope，可选）、描述（subject）</strong>，并可附加<strong>详细说明（body，可选）<strong>和</strong>关闭的issue（footer，可选）</strong></p>
+<p>基本格式：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[body]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[footer]
+</span></span></code></pre></div><p>示例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>feat(user): 新增用户注册验证码功能
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>- 集成短信验证码接口
+</span></span><span style="display:flex;"><span>- 增加验证码有效期校验
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Closes #123
+</span></span></code></pre></div><h3 id="核心字段说明">核心字段说明</h3>
+<ol>
+<li>类型（type）
+必须指定，说明提交的性质，取值范围：
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">类型</th>
+          <th style="text-align: left">含义</th>
+          <th style="text-align: left">适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>feat</strong></td>
+          <td style="text-align: left">新功能开发</td>
+          <td style="text-align: left">feature 分支开发新功能</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>fix</strong></td>
+          <td style="text-align: left">修复 Bug</td>
+          <td style="text-align: left">feature (普通 Bug)、hotfix (生产 Bug)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>docs</strong></td>
+          <td style="text-align: left">文档更新</td>
+          <td style="text-align: left">接口文档、注释调整 (仅修改文档，不涉及代码)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>style</strong></td>
+          <td style="text-align: left">代码格式调整</td>
+          <td style="text-align: left">缩进、命名规范、删除多余空格等 (不影响代码逻辑)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>refactor</strong></td>
+          <td style="text-align: left">代码重构</td>
+          <td style="text-align: left">逻辑优化、变量重名、函数拆分 (既非新功能也非修复 Bug)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>perf</strong></td>
+          <td style="text-align: left">性能优化</td>
+          <td style="text-align: left">减少数据库查询、优化算法复杂度</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>test</strong></td>
+          <td style="text-align: left">新增 / 修改测试用例</td>
+          <td style="text-align: left">单元测试、集成测试</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>build</strong></td>
+          <td style="text-align: left">构建配置修改</td>
+          <td style="text-align: left">依赖版本调整、打包脚本修改</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>ci</strong></td>
+          <td style="text-align: left">CI 流程配置修改</td>
+          <td style="text-align: left">GitLab CI、Jenkins 脚本调整</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>chore</strong></td>
+          <td style="text-align: left">其他操作</td>
+          <td style="text-align: left">清理临时文件、修改 .gitignore (不影响代码逻辑的操作)</td>
+      </tr>
+  </tbody>
+</table>
+</li>
+<li>范围（scope）
+可选，说明提交影响的模块/服务，建议使用<strong>服务名</strong>、<strong>模块名</strong>或<strong>功能点</strong>，如：
+<ul>
+<li>服务名：user（用户服务）、order（订单服务）</li>
+<li>模块名：dao（数据访问层）、controller（接口层）</li>
+<li>功能点：login（登录）、pay（支付）</li>
+</ul>
+</li>
+<li>描述（subject）
+<ul>
+<li>简要描述提交内容，不超过 50 个字符</li>
+<li>以动词开头（如 “新增”“修复”“优化”），首字母小写，结尾不加句号</li>
+<li>示例：
+<blockquote>
+<ul>
+<li>feat(order): 支持批量取消订单</li>
+<li>fix(redis): 修复缓存过期时间计算错误</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>详细说明（body）
+可选，用于补充subject未说明的细节，可分点描述（使用<code>-</code>或者<code>*</code>开头）：</li>
+</ol>
+<ul>
+<li>说明“为什么做这个修改”、“实现思路”、“与之前的区别”等</li>
+<li>示例：
+<blockquote>
+<p>fix(login): 修复密码错误次数超限后未锁定账号的问题</p>
+<ul>
+<li>原逻辑仅记录错误次数，未触发锁定机制</li>
+<li>新增判断逻辑：错误次数≥5时，调用账号锁定接口</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<ol start="5">
+<li>关闭的issue（footer）
+可选，用于关联并关闭相关的任务/缺陷编号（需与项目管理工具联动，如Jira、GitLab Issues）：</li>
+</ol>
+<ul>
+<li>格式：<strong>Closes #issue编号</strong>或<strong>Fixes #issue编号</strong></li>
+<li>示例：<strong>Closes #456</strong>（关闭编号456的issue）</li>
+</ul>
+<h3 id="禁止性规范">禁止性规范</h3>
+<ol>
+<li>禁止一次提交包含多个不相关的修改（如同时开发新功能 + 修复另一个Bug），需拆分多次提交</li>
+<li>禁止使用模糊描述（如“修改了一些问题”、“更新代码”），必须明确具体内容</li>
+<li>禁止提交无关文件（如IDE配置、本地日志），通过<code>.gitignore</code>过滤</li>
+</ol>
+<h3 id="提交记录示例">提交记录示例</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">分支类型</th>
+          <th style="text-align: left">提交信息示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>feature</strong></td>
+          <td style="text-align: left">feat(pay): 新增支付宝支付接口</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>feature</strong></td>
+          <td style="text-align: left">refactor(order): 拆分订单创建逻辑为独立服务</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>release</strong></td>
+          <td style="text-align: left">fix(logger): 修复生产环境日志打印乱码问题</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>hotfix</strong></td>
+          <td style="text-align: left">fix(user): 紧急修复用户登录时密码解密报错</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>develop</strong></td>
+          <td style="text-align: left">docs(api): 更新用户服务接口文档</td>
+      </tr>
+  </tbody>
+</table>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>
