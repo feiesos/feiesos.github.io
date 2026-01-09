@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="核心基础
+Hutool和Hutool常用工具集
+Hutool是一个小而全的国产开源Java工具类库，通过静态方法封装，降低相关API的学习成本，提高工作效率，使Java拥有函数式语言般的优雅
+包含组件
+一个Java基础工具类，对文件、流、加密解密、转码、正则、线程、XML等JDK方法进行封装，组成各种Util工具类，同时提供以下组件：
+
+  
+      
+          模块名称
+          功能介绍
+      
+  
+  
+      
+          hutool-aop
+          JDK 动态代理封装，提供非 IOC 下的切面支持
+      
+      
+          hutool-bloomFilter
+          布隆过滤，提供一些 Hash 算法的布隆过滤
+      
+      
+          hutool-cache
+          简单缓存实现
+      
+      
+          hutool-core
+          核心，包括 Bean 操作、日期、各种 Util 等
+      
+      
+          hutool-cron
+          定时任务模块，提供类 Crontab 表达式的定时任务
+      
+      
+          hutool-crypto
+          加密解密模块，提供对称、非对称和摘要算法封装
+      
+      
+          hutool-db
+          JDBC 封装后的数据操作，基于 ActiveRecord 思想
+      
+      
+          hutool-dfa
+          基于 DFA 模型的多关键字查找
+      
+      
+          hutool-extra
+          扩展模块，对第三方封装（模板引擎、邮件、Servlet、二维码、Emoji、FTP、分词等）
+      
+      
+          hutool-http
+          基于 HttpUrlConnection 的 Http 客户端封装
+      
+      
+          hutool-log
+          自动识别日志实现的日志门面
+      
+      
+          hutool-script
+          脚本执行封装，例如 Javascript
+      
+      
+          hutool-setting
+          功能更强大的 Setting 配置文件和 Properties 封装
+      
+      
+          hutool-system
+          系统参数调用封装（JVM 信息等）
+      
+      
+          hutool-json
+          JSON 实现
+      
+      
+          hutool-captcha
+          图片验证码实现
+      
+      
+          hutool-poi
+          针对 POI 中 Excel 和 Word 的封装
+      
+      
+          hutool-socket
+          基于 Java 的 NIO 和 AIO 的 Socket 封装
+      
+      
+          hutool-jwt
+          JSON Web Token (JWT) 封装实现
+      
+  
+
+可以根据需要对每个模块进行单独引入，也可以通过引入hutool-all方式引入所有模块">  
+
+  <title>
+    
+      Week02
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2026-01-09 14:55:45 &#43;0800 CST">
+            2026-01-09
+        </time>
+    </p>
+
+    <h1>Week02</h1>
+
+    
+        <aside  class="toc" >
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#hutool和hutool常用工具集">Hutool和Hutool常用工具集</a>
+      <ul>
+        <li><a href="#包含组件">包含组件</a></li>
+        <li><a href="#安装">安装</a></li>
+        <li><a href="#具体使用">具体使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#mysql索引设计规范">MySQL索引设计规范</a>
+      <ul>
+        <li><a href="#索引设计核心原则">索引设计核心原则</a></li>
+        <li><a href="#索引类型设计规范">索引类型设计规范</a></li>
+        <li><a href="#索引设计禁忌">索引设计禁忌</a></li>
+        <li><a href="#索引维护与优化规范">索引维护与优化规范</a></li>
+        <li><a href="#典型场景索引设计示例">典型场景索引设计示例</a></li>
+        <li><a href="#索引设计检查清单">索引设计检查清单</a></li>
+      </ul>
+    </li>
+    <li><a href="#sql编写规范">SQL编写规范</a>
+      <ul>
+        <li><a href="#基础格式规范">基础格式规范</a></li>
+        <li><a href="#查询语句select规范">查询语句（SELECT）规范</a></li>
+        <li><a href="#写入与更新语句insertupdatedelete规范">写入与更新语句（INSERT/UPDATE/DELETE）规范</a></li>
+        <li><a href="#性能与安全规范">性能与安全规范</a></li>
+        <li><a href="#注释规范">注释规范</a></li>
+        <li><a href="#检查清单">检查清单</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据库表设计规范">数据库表设计规范</a>
+      <ul>
+        <li><a href="#基础设计原则">基础设计原则</a></li>
+        <li><a href="#必选字段规范强制要求">必选字段规范（强制要求）</a></li>
+        <li><a href="#字段设计规范">字段设计规范</a></li>
+        <li><a href="#索引设计规范关联补充">索引设计规范（关联补充）</a></li>
+        <li><a href="#表结构示范符合规范">表结构示范（符合规范）</a></li>
+        <li><a href="#设计检查清单">设计检查清单</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </aside>
+    
+
+    <h1 id="核心基础">核心基础</h1>
+<h2 id="hutool和hutool常用工具集">Hutool和Hutool常用工具集</h2>
+<p>Hutool是一个小而全的国产开源Java工具类库，通过静态方法封装，降低相关API的学习成本，提高工作效率，使Java拥有函数式语言般的优雅</p>
+<h3 id="包含组件">包含组件</h3>
+<p>一个Java基础工具类，对文件、流、加密解密、转码、正则、线程、XML等JDK方法进行封装，组成各种Util工具类，同时提供以下组件：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">模块名称</th>
+          <th style="text-align: left">功能介绍</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">hutool-aop</td>
+          <td style="text-align: left">JDK 动态代理封装，提供非 IOC 下的切面支持</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-bloomFilter</td>
+          <td style="text-align: left">布隆过滤，提供一些 Hash 算法的布隆过滤</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-cache</td>
+          <td style="text-align: left">简单缓存实现</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-core</td>
+          <td style="text-align: left">核心，包括 Bean 操作、日期、各种 Util 等</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-cron</td>
+          <td style="text-align: left">定时任务模块，提供类 Crontab 表达式的定时任务</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-crypto</td>
+          <td style="text-align: left">加密解密模块，提供对称、非对称和摘要算法封装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-db</td>
+          <td style="text-align: left">JDBC 封装后的数据操作，基于 ActiveRecord 思想</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-dfa</td>
+          <td style="text-align: left">基于 DFA 模型的多关键字查找</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-extra</td>
+          <td style="text-align: left">扩展模块，对第三方封装（模板引擎、邮件、Servlet、二维码、Emoji、FTP、分词等）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-http</td>
+          <td style="text-align: left">基于 HttpUrlConnection 的 Http 客户端封装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-log</td>
+          <td style="text-align: left">自动识别日志实现的日志门面</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-script</td>
+          <td style="text-align: left">脚本执行封装，例如 Javascript</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-setting</td>
+          <td style="text-align: left">功能更强大的 Setting 配置文件和 Properties 封装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-system</td>
+          <td style="text-align: left">系统参数调用封装（JVM 信息等）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-json</td>
+          <td style="text-align: left">JSON 实现</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-captcha</td>
+          <td style="text-align: left">图片验证码实现</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-poi</td>
+          <td style="text-align: left">针对 POI 中 Excel 和 Word 的封装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-socket</td>
+          <td style="text-align: left">基于 Java 的 NIO 和 AIO 的 Socket 封装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">hutool-jwt</td>
+          <td style="text-align: left">JSON Web Token (JWT) 封装实现</td>
+      </tr>
+  </tbody>
+</table>
+<p>可以根据需要对每个模块进行单独引入，也可以通过引入<code>hutool-all</code>方式引入所有模块</p>
+<h3 id="安装">安装</h3>
+<ul>
+<li>Maven
+在项目的pom.xml的dependencies中加入以下内容：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>cn.hutool<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>hutool-all<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>5.8.16<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div></li>
+<li>Gradle
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">implementation</span> <span style="color:#e6db74">&#39;cn.hutool:hutool-all:5.8.16&#39;</span>
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="具体使用">具体使用</h3>
+<p>参考<a href="https://hutool.cn/docs/"><code>官方文档</code></a>中<strong>Hutool-core</strong>部分</p>
+<hr>
+<h2 id="mysql索引设计规范">MySQL索引设计规范</h2>
+<h3 id="索引设计核心原则">索引设计核心原则</h3>
+<ol>
+<li>必要性原则</li>
+</ol>
+<ul>
+<li>仅为<strong>查询</strong>、<strong>排序</strong>、<strong>分组频繁</strong>的字段创建索引，禁止为低频查询字段（如一年仅查询几次的归档字段）建索引</li>
+<li>索引需匹配业务查询场景，避免 “为建而建”（如仅存在UPDATE/DELETE条件但无查询的字段无需索引）</li>
+</ul>
+<ol start="2">
+<li>适度性原则</li>
+</ol>
+<ul>
+<li>单表索引数量<strong>不超过5个</strong>（除非表数据量极小且查询复杂），过多索引会导致：
+<ul>
+<li>写入 / 更新性能下降（每次变更需同步维护索引树）</li>
+<li>MySQL 优化器选择索引的计算成本升高，可能选错索引</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>平衡性原则</li>
+</ol>
+<ul>
+<li><strong>查询密集表</strong>（如订单查询表、用户信息表）可适当增加索引（≤8 个）</li>
+<li><strong>写入密集表</strong>（如日志表、消息表）索引宜少（≤3 个），优先保证写入性能</li>
+<li>大表（100 万行以上）索引需更严格控制，避免索引维护开销过大</li>
+</ul>
+<ol start="4">
+<li>时效性原则</li>
+</ol>
+<ul>
+<li>定期（如每季度）清理无效索引（长期未使用、冗余索引），避免索引膨胀</li>
+</ul>
+<h3 id="索引类型设计规范">索引类型设计规范</h3>
+<ol>
+<li>主键索引（PRIMARY KEY）</li>
+</ol>
+<ul>
+<li><strong>强制要求</strong>：每张表必须设置主键，且主键字段禁止为 NULL</li>
+<li><strong>类型选择</strong>：
+<ul>
+<li>优先使用<strong>自增整数型</strong>（INT/BIGINT），优势：
+<ul>
+<li>连续写入，减少索引页分裂</li>
+<li>索引树结构紧凑，查询效率高</li>
+</ul>
+</li>
+<li>禁止使用 UUID / 字符串作为主键（离散写入导致大量页分裂，性能下降 50%+）</li>
+<li>禁止使用业务字段（如订单号、用户手机号）作为主键（业务变更可能导致主键修改）</li>
+</ul>
+</li>
+<li><strong>特性约束</strong>：主键字段禁止更新，避免破坏索引树结构</li>
+</ul>
+<ol start="2">
+<li>普通索引（INDEX）</li>
+</ol>
+<ul>
+<li><strong>适用场景</strong>：单字段查询（如WHERE status = 1）、排序（如ORDER BY create_time）、分组（如GROUP BY user_id）</li>
+<li><strong>命名规范</strong>：idx_字段名（如idx_status、idx_create_time）</li>
+<li><strong>设计要点</strong>：
+<ul>
+<li>字段长度较长时（如VARCHAR(100)），评估是否必要（索引存储成本高）</li>
+<li>避免对高频更新字段（如last_login_time）建普通索引（更新会触发索引树重建）</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>联合索引</li>
+</ol>
+<ul>
+<li><strong>适用场景</strong>：多字段组合查询（如WHERE user_id = 100 AND status = 2）</li>
+<li><strong>最左前缀原则</strong>：查询条件需包含联合索引的左侧字段，否则索引失效例如：
+<ul>
+<li>联合索引(a, b, c)可匹配：
+<ul>
+<li>WHERE a = 1</li>
+<li>WHERE a = 1 AND b = 2</li>
+<li>WHERE a = 1 AND b = 2 AND c = 3</li>
+</ul>
+</li>
+<li>不可匹配：
+<ul>
+<li>WHERE b = 2（缺少最左字段a）</li>
+<li>WHERE a = 1 AND c = 3（跳过b，仅a部分生效）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>字段顺序规则</strong>：
+<ol>
+<li><strong>过滤性优先</strong>：将过滤性强的字段放在左侧（过滤性 = 字段去重后的值数量 / 总记录数，如手机号 &gt; 性别）</li>
+<li><strong>查询频率优先</strong>：常作为单字段查询的字段放在左侧（可复用索引，如(user_id, status)可同时支持WHERE user_id = ?和WHERE user_id = ? - AND status = ?）</li>
+<li><strong>长度优先</strong>：短字段放左侧（索引树更紧凑，如(status, username)优于(username, status)）</li>
+</ol>
+</li>
+<li><strong>命名规范</strong>：idx_字段1_字段2_字段3（如idx_userid_status）</li>
+<li><strong>冗余避免</strong>：已有联合索引(a, b)时，无需单独创建(a)索引（联合索引前缀可被复用）</li>
+</ul>
+<ol start="4">
+<li>唯一索引（UNIQUE）</li>
+</ol>
+<ul>
+<li><strong>适用场景</strong>：保证字段唯一性（如手机号、邮箱、订单号），替代业务层校验（数据库层面更可靠）</li>
+<li><strong>命名规范</strong>：uniq_字段名（单一字段）或uniq_字段1_字段2（联合唯一）</li>
+<li><strong>逻辑删除场景适配</strong>（核心补充）：
+<ul>
+<li>若表使用逻辑删除（如is_deleted字段，0 = 未删，1 = 已删），<strong>唯一索引必须包含删除标记</strong>，形成联合唯一索引，避免 “已删除记录阻塞新记录插入”</li>
+<li>示例：用户表phone字段需唯一且支持逻辑删除，应创建：
+<blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">UNIQUE</span> <span style="color:#66d9ef">INDEX</span> uniq_phone_deleted <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">user</span> (phone, is_deleted);
+</span></span></code></pre></div></blockquote>
+<ul>
+<li>原理：已删除记录（is_deleted=1）与新记录（is_deleted=0）的索引值不同（(phone,1) vs (phone,0)），允许插入同手机号的新记录，同时保证未删除记录的唯一性</li>
+</ul>
+</li>
+<li>禁忌：禁止仅对业务字段建唯一索引（如UNIQUE INDEX uniq_phone (phone)），否则删除的记录会导致新记录无法插入</li>
+</ul>
+</li>
+<li><strong>特殊场景</strong>：若业务要求 “即使记录被删除，也不允许再次插入同值数据”（如身份证号），则无需包含is_deleted，保持单一字段唯一索引</li>
+</ul>
+<ol start="5">
+<li>前缀索引</li>
+</ol>
+<ul>
+<li><strong>适用场景</strong>：长字符串字段（如VARCHAR(255)、TEXT前 N 位），需加速前缀匹配查询（如WHERE title LIKE &lsquo;Java%&rsquo;）</li>
+<li><strong>设计方法</strong>：
+<ul>
+<li>通过SELECT COUNT(DISTINCT LEFT(字段名, N)) / COUNT(*) FROM 表名计算前缀选择性，N 取 “选择性接近 1 且长度最小” 的值（通常 20-50 字符）</li>
+<li>示例：对title字段建前缀索引：
+<blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>   <span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">INDEX</span> idx_title_prefix <span style="color:#66d9ef">ON</span> article (title(<span style="color:#ae81ff">30</span>)); <span style="color:#75715e">-- 取前30字符
+</span></span></span></code></pre></div></blockquote>
+</li>
+</ul>
+</li>
+<li><strong>限制</strong>：前缀索引无法用于ORDER BY、GROUP BY，也无法通过=精确匹配（仅支持前缀匹配）</li>
+</ul>
+<h3 id="索引设计禁忌">索引设计禁忌</h3>
+<ol>
+<li>低价值索引禁止</li>
+</ol>
+<ul>
+<li><strong>低基数字段</strong>：禁止对基数 &lt; 10 的字段建索引（如性别gender（男 / 女）、状态status（0/1/2）），索引选择性低，查询可能全表扫描更快</li>
+<li><strong>高频更新字段</strong>：避免对更新频率 &gt; 查询频率的字段建索引（如last_modify_time），每次更新会触发索引树重构，影响性能</li>
+<li><strong>大字段全索引</strong>：禁止对TEXT、BLOB类型字段建全字段索引（存储成本极高），如需索引必须用前缀索引</li>
+</ul>
+<ol start="2">
+<li>索引失效场景避免</li>
+</ol>
+<ul>
+<li><strong>函数 / 表达式操作</strong>：索引字段参与函数或表达式运算会导致索引失效，例如：
+<ul>
+<li>错误：<code>WHERE SUBSTR(phone, 1, 3) = '138'</code>（函数操作）</li>
+<li>错误：<code>WHERE create_time + INTERVAL 1 DAY &gt; NOW()</code>（表达式）</li>
+<li>正确：<code>WHERE phone LIKE '138%'</code>（前缀匹配，可命中索引）</li>
+</ul>
+</li>
+<li><strong>隐式类型转换</strong>：字段类型与查询值类型不匹配会触发转换，导致索引失效，例如：
+<ul>
+<li>错误：<code>WHERE phone = 13800138000</code>（phone为VARCHAR，值为数字）</li>
+<li>正确：<code>WHERE phone = '13800138000'</code>（类型一致）</li>
+</ul>
+</li>
+<li><strong>负向查询</strong>：NOT IN、!=、&lt;&gt;、NOT EXISTS、IS NOT NULL通常无法使用索引，建议重构为正向查询，例如：
+<ul>
+<li>错误：<code>WHERE status != 0</code></li>
+<li>正确：<code>WHERE status IN (1, 2, 3)</code>（若状态值有限）</li>
+</ul>
+</li>
+<li><strong>模糊查询前缀</strong> wildcard：LIKE &lsquo;%xxx&rsquo;或LIKE &lsquo;%xxx%&lsquo;会导致索引失效，仅LIKE &lsquo;xxx%&lsquo;可命中前缀索引，例如：
+<ul>
+<li>错误：<code>WHERE username LIKE '%张三'</code></li>
+<li>正确：<code>WHERE username LIKE '张三%'</code></li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>重复与冗余索引禁止</li>
+</ol>
+<ul>
+<li><strong>重复索引</strong>：同一<strong>字段</strong>/<strong>字段组合</strong>创建多个索引（如同时存在idx_a和idx_a），需删除重复项</li>
+<li><strong>冗余索引</strong>：联合索引已包含的前缀字段无需单独建索引（如已有(a, b)，则(a)为冗余索引）</li>
+</ul>
+<h3 id="索引维护与优化规范">索引维护与优化规范</h3>
+<ol>
+<li>索引监控</li>
+</ol>
+<ul>
+<li><strong>工具使用</strong>：
+<ul>
+<li>通过SHOW INDEX FROM 表名查看索引信息，关注Cardinality（基数），基数越接近表行数，索引选择性越好</li>
+<li>利用慢查询日志（slow log）和EXPLAIN分析查询计划，识别未使用的索引（type: ALL表示全表扫描）</li>
+<li>MySQL 8.0 + 可通过sys.schema_unused_indexes视图直接查询未使用的索引</li>
+</ul>
+</li>
+<li><strong>监控指标</strong>：
+<ul>
+<li>索引使用率（使用次数 / 总查询次数）：低于 10% 的索引需评估删除</li>
+<li>索引维护成本（写入时索引更新耗时）：写入频繁且维护成本高的索引优先删除</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>索引优化操作</li>
+</ol>
+<ul>
+<li><strong>无效索引清理</strong>：对连续 3 个月未使用的索引，经业务确认后删除（删除前备份表结构）</li>
+<li><strong>索引重建</strong>：当索引碎片率 &gt; 30%（SHOW TABLE STATUS LIKE &lsquo;表名&rsquo;查看Data_free），执行：</li>
+</ul>
+<blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#960050;background-color:#1e0010">表名</span> <span style="color:#66d9ef">FORCE</span> <span style="color:#66d9ef">INDEX</span> (<span style="color:#960050;background-color:#1e0010">索引名</span>); <span style="color:#75715e">-- 重建指定索引
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 或重建全表索引（适用于MyISAM，InnoDB建议用OPTIMIZE TABLE）
+</span></span></span><span style="display:flex;"><span>OPTIMIZE <span style="color:#66d9ef">TABLE</span> <span style="color:#960050;background-color:#1e0010">表名</span>;
+</span></span></code></pre></div></blockquote>
+<ul>
+<li><strong>大表索引操作</strong>：</li>
+<li>表数据量 &gt; 100 万行时，创建 / 删除索引需在业务低峰期执行</li>
+<li>MySQL 8.0 + 使用ALTER TABLE &hellip; ALGORITHM=INPLACE减少锁表时间（避免全表锁）</li>
+<li>批量导入数据前，先删除索引，导入后重建（减少索引维护开销）</li>
+</ul>
+<h3 id="典型场景索引设计示例">典型场景索引设计示例</h3>
+<ol>
+<li>
+<p>用户表
+user，含逻辑删除</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">字段名</th>
+          <th style="text-align: left">类型</th>
+          <th style="text-align: left">索引设计</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">create_time</td>
+          <td style="text-align: left">DATETIME</td>
+          <td style="text-align: left">INDEX idx_createtime (create_time)</td>
+          <td style="text-align: left">用于按注册时间排序、筛选</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">id</td>
+          <td style="text-align: left">BIGINT</td>
+          <td style="text-align: left">PRIMARY KEY</td>
+          <td style="text-align: left">自增主键，唯一标识用户</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">is_deleted</td>
+          <td style="text-align: left">TINYINT</td>
+          <td style="text-align: left">(无单独索引，包含在联合唯一索引中)</td>
+          <td style="text-align: left">逻辑删除标记 (0 = 未删，1 = 已删)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">phone</td>
+          <td style="text-align: left">VARCHAR(20)</td>
+          <td style="text-align: left">UNIQUE INDEX uniq_phone_deleted (phone, is_deleted)</td>
+          <td style="text-align: left">同上，保证手机号唯一</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">user_type</td>
+          <td style="text-align: left">TINYINT</td>
+          <td style="text-align: left">INDEX idx_usertype (user_type)</td>
+          <td style="text-align: left">用于按用户类型筛选（如会员 / 非会员）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">username</td>
+          <td style="text-align: left">VARCHAR(50)</td>
+          <td style="text-align: left">UNIQUE INDEX uniq_username_deleted (username, is_deleted)</td>
+          <td style="text-align: left">联合唯一索引，适配逻辑删除</td>
+      </tr>
+  </tbody>
+</table>
+</li>
+<li>
+<p>订单表
+order</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">字段名</th>
+          <th style="text-align: left">类型</th>
+          <th style="text-align: left">索引设计</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">id</td>
+          <td style="text-align: left">BIGINT</td>
+          <td style="text-align: left">PRIMARY KEY</td>
+          <td style="text-align: left">自增主键</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">order_no</td>
+          <td style="text-align: left">VARCHAR(32)</td>
+          <td style="text-align: left">UNIQUE INDEX uniq_orderno (order_no)</td>
+          <td style="text-align: left">订单号唯一，无逻辑删除需求</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">user_id</td>
+          <td style="text-align: left">BIGINT</td>
+          <td style="text-align: left">INDEX idx_userid_createtime (user_id, create_time)</td>
+          <td style="text-align: left">支持“查询用户的订单并按时间排序”</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">status</td>
+          <td style="text-align: left">TINYINT</td>
+          <td style="text-align: left">INDEX idx_status_createtime (status, create_time)</td>
+          <td style="text-align: left">支持“查询特定状态的订单并按时间筛选”</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">pay_time</td>
+          <td style="text-align: left">DATETIME</td>
+          <td style="text-align: left">INDEX idx_paytime (pay_time)</td>
+          <td style="text-align: left">用于按支付时间统计 / 筛选</td>
+      </tr>
+  </tbody>
+</table>
+</li>
+</ol>
+<h3 id="索引设计检查清单">索引设计检查清单</h3>
+<ol>
+<li>每张表是否设置自增整数型主键？</li>
+<li>单表索引数量是否超过5个（特殊场景小于等于8个）？</li>
+<li>联合索引是否遵循<strong>最左前缀原则</strong>，字段顺序是否合理？</li>
+<li>逻辑删除表的唯一索引是否包含is_deleted字段？</li>
+<li>是否存在<strong>低基数字段</strong>（如性别）、<strong>高频更新字段</strong>的索引？</li>
+<li>是否存在<strong>重复索引</strong>或<strong>冗余索引</strong>？</li>
+<li>索引是否被有效使用（通过EXPLAIN验证，type为ref/range/const）？</li>
+</ol>
+<hr>
+<h2 id="sql编写规范">SQL编写规范</h2>
+<h3 id="基础格式规范">基础格式规范</h3>
+<ol>
+<li>关键字与函数</li>
+</ol>
+<ul>
+<li>所有SQL关键字（如SELECT、INSERT、UPDATE、WHERE）和内置函数（如COUNT、DATE_FORMAT）必须大写，提升可读性
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, username <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> id, username <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">where</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div></li>
+<li>关键字和函数名后不加空格，与参数之间用空格分隔（如COUNT(id)而非COUNT(id)）</li>
+</ul>
+<ol start="2">
+<li>换行与缩进</li>
+</ol>
+<ul>
+<li>一条SQL语句过长（超过120字符）时，按逻辑拆分换行：
+<ul>
+<li>SELECT子句：每个字段单独换行，逗号置于行尾</li>
+<li>FROM、JOIN、WHERE、GROUP BY、ORDER BY 等子句单独换行，且缩进4个空格
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    u.id,
+</span></span><span style="display:flex;"><span>    u.username,
+</span></span><span style="display:flex;"><span>    o.order_no,
+</span></span><span style="display:flex;"><span>    o.create_time
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">user</span> u
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> o <span style="color:#66d9ef">ON</span> u.id <span style="color:#f92672">=</span> o.user_id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span>
+</span></span><span style="display:flex;"><span>    u.status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> o.create_time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#39;2025-01-01&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span>
+</span></span><span style="display:flex;"><span>    o.create_time <span style="color:#66d9ef">DESC</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（单行过长，可读性差）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> u.id, u.username, o.order_no, o.create_time <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> u <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> o <span style="color:#66d9ef">ON</span> u.id <span style="color:#f92672">=</span> o.user_id <span style="color:#66d9ef">WHERE</span> u.status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> o.create_time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#39;2025-01-01&#39;</span> <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> o.create_time <span style="color:#66d9ef">DESC</span>;
+</span></span></code></pre></div></li>
+</ul>
+</li>
+<li>子查询需用括号包裹，并在括号内缩进（与外层保持一致）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    t.user_id,
+</span></span><span style="display:flex;"><span>    t.order_count
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>        user_id,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">AS</span> order_count
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span>
+</span></span><span style="display:flex;"><span>        user_id
+</span></span><span style="display:flex;"><span>) t
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span>
+</span></span><span style="display:flex;"><span>    t.order_count <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">5</span>;
+</span></span></code></pre></div></li>
+</ul>
+<ol start="3">
+<li>命名规范</li>
+</ol>
+<ul>
+<li><strong>表名</strong>/<strong>字段名</strong>：使用小写字母，下划线分隔（如user_info、order_no），禁止使用驼峰命名（如userInfo）</li>
+<li><strong>别名</strong>：简洁明了，表别名用<strong>1-2个小写字母</strong>（如u代表user，o代表order），列别名用有意义的名称（如order_count而非c）</li>
+<li><strong>关键字冲突处理</strong>：若<strong>表名</strong>/<strong>字段名</strong>与SQL关键字冲突（如order、user），必须用反引号<code>`</code>包裹：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#f92672">`</span>status<span style="color:#f92672">`</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（未处理关键字冲突）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">WHERE</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="查询语句select规范">查询语句（SELECT）规范</h3>
+<ol>
+<li>字段查询</li>
+</ol>
+<ul>
+<li>禁止使用<code>SELECT *</code>，必须明确指定所需字段（避免返回冗余数据，减少 IO 开销，且防止表结构变更导致的异常）
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, username <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>;
+</span></span></code></pre></div></li>
+<li>避免重复查询相同字段（如<code>SELECT id, id FROM user</code>）</li>
+</ul>
+<ol start="2">
+<li>WHERE条件</li>
+</ol>
+<ul>
+<li>优先使用<code>=</code>、<code>IN</code>、<code>BETWEEN</code> 等高效条件，减少<code>OR</code>、<code>NOT IN</code>的使用（可能导致全表扫描）
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 推荐
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> status <span style="color:#66d9ef">IN</span> (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> create_time <span style="color:#66d9ef">BETWEEN</span> <span style="color:#e6db74">&#39;2025-01-01&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#39;2025-12-31&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 不推荐（可用 IN 替代）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">OR</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> create_time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#39;2025-01-01&#39;</span> <span style="color:#66d9ef">AND</span> create_time <span style="color:#f92672">&lt;=</span> <span style="color:#e6db74">&#39;2025-12-31&#39;</span>
+</span></span></code></pre></div></li>
+<li>逻辑删除表必须包含删除标记条件（如is_deleted = 0），避免查询到已删除数据：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">AND</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（未过滤已删除数据）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div></li>
+</ul>
+<ol start="3">
+<li>JOIN操作</li>
+</ol>
+<ul>
+<li>明确指定JOIN类型（INNER JOIN、LEFT JOIN等），禁止省略（如用JOIN代替INNER JOIN可能导致歧义）</li>
+<li>LEFT JOIN时，右表的过滤条件需放在<code>ON</code>后，左表的过滤条件放在<code>WHERE</code>后：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确（右表过滤放 ON，左表过滤放 WHERE）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> u.id, o.order_no
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> u
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> o 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> u.id <span style="color:#f92672">=</span> o.user_id 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> o.status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e">-- 右表条件：只关联状态为1的订单
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> u.is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;  <span style="color:#75715e">-- 左表条件：过滤未删除用户
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（右表条件放 WHERE，会导致 LEFT JOIN 退化为 INNER JOIN）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> u.id, o.order_no
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> u
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> o <span style="color:#66d9ef">ON</span> u.id <span style="color:#f92672">=</span> o.user_id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> u.is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">AND</span> o.status <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div></li>
+<li>避免<strong>超过3张表</strong>的JOIN操作（多表JOIN会增加查询复杂度和性能开销，可拆分为<strong>子查询</strong>或<strong>分步查询</strong>）</li>
+</ul>
+<ol start="4">
+<li>GROUP BY与ORDER BY</li>
+</ol>
+<ul>
+<li>GROUP BY必须包含所有非聚合字段（与 SELECT 子句中的非聚合字段一致），避免隐式分组导致的结果不可控
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> user_id, status, <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> user_id, status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（SELECT 包含非聚合字段 order_no，未在 GROUP BY 中）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> user_id, order_no, <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> user_id; 
+</span></span></code></pre></div></li>
+<li>ORDER BY排序字段需确保有索引支持（如<code>ORDER BY create_time</code>需有<code>idx_create_time</code>索引），避免大表排序导致的性能问题</li>
+<li>禁止在ORDER BY中使用表达式或函数（如<code>ORDER BY YEAR(create_time)</code>），会导致索引失效</li>
+</ul>
+<ol start="5">
+<li>子查询与分页（优先使用Mabatis-plus分页插件）</li>
+</ol>
+<ul>
+<li>子查询结果集较大时，建议用 LIMIT 限制行数，或转为 JOIN 操作（子查询可能导致临时表创建）</li>
+<li>分页查询必须使用 LIMIT，且优先通过索引字段分页（如<code>WHERE id &gt; 100 LIMIT 20</code>优于<code>LIMIT 100, 20</code>，避免全表扫描）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 推荐（基于索引字段分页，高效）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, username <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">AND</span> id <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">100</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">20</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 不推荐（大偏移量会扫描大量无用数据）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, username <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">20</span>;
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="写入与更新语句insertupdatedelete规范">写入与更新语句（INSERT/UPDATE/DELETE）规范</h3>
+<ol>
+<li>INSERT语句</li>
+</ol>
+<ul>
+<li>必须指定插入的字段名（避免表结构变更导致的字段顺序问题）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">user</span> (username, phone, create_time)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;test&#39;</span>, <span style="color:#e6db74">&#39;13800138000&#39;</span>, NOW());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（未指定字段，依赖表结构顺序）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">VALUES</span> (<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#39;test&#39;</span>, <span style="color:#e6db74">&#39;13800138000&#39;</span>, NOW());
+</span></span></code></pre></div></li>
+<li>批量插入时，优先使用多值插入（减少SQL执行次数）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 推荐（一次插入多条）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">user</span> (username, phone)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">VALUES</span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;user1&#39;</span>, <span style="color:#e6db74">&#39;13800138001&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;user2&#39;</span>, <span style="color:#e6db74">&#39;13800138002&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 不推荐（多次单条插入）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">user</span> (username, phone) <span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;user1&#39;</span>, <span style="color:#e6db74">&#39;13800138001&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">user</span> (username, phone) <span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;user2&#39;</span>, <span style="color:#e6db74">&#39;13800138002&#39;</span>);
+</span></span></code></pre></div></li>
+<li>大表批量插入（&gt;1000 条）时，需分批次插入（每批 500-1000 条），避免占用过多连接资源</li>
+</ul>
+<ol start="2">
+<li>UPDATE与DELETE语句</li>
+</ol>
+<ul>
+<li>必须包含 WHERE 条件（除非明确要操作全表），禁止无条件更新 / 删除（避免误操作导致全表数据变更）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 正确（有明确条件）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">SET</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> <span style="color:#66d9ef">WHERE</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> create_time <span style="color:#f92672">&lt;</span> <span style="color:#e6db74">&#39;2024-01-01&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 错误（无条件，风险极高）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">SET</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span>;
+</span></span></code></pre></div></li>
+<li>逻辑删除优先于物理删除：通过UPDATE设置is_deleted = 1替代DELETE，保留数据用于追溯：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 推荐（逻辑删除）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">SET</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, delete_time <span style="color:#f92672">=</span> NOW() <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 不推荐（物理删除，数据无法恢复）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+</span></span></code></pre></div></li>
+<li>大表<strong>更新</strong>/<strong>删除</strong>时，需加限制条件分批次操作（如每次处理 1000 条），避免长时间锁表：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 分批次更新（每次 1000 条）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> <span style="color:#66d9ef">user</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> status <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">AND</span> create_time <span style="color:#f92672">&lt;</span> <span style="color:#e6db74">&#39;2024-01-01&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">1000</span>;
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="性能与安全规范">性能与安全规范</h3>
+<ol>
+<li>性能优化</li>
+</ol>
+<ul>
+<li>避免在 WHERE 条件中对索引字段做<strong>函数</strong>/<strong>表达式</strong>操作（导致索引失效）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 错误（函数操作导致索引失效）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> SUBSTR(phone, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>) <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;138&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> <span style="color:#66d9ef">WHERE</span> DATE(create_time) <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;2025-11-19&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 正确（改写为索引友好的条件）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">WHERE</span> phone <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;138%&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span> <span style="color:#66d9ef">WHERE</span> create_time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#39;2025-11-19&#39;</span> <span style="color:#66d9ef">AND</span> create_time <span style="color:#f92672">&lt;</span> <span style="color:#e6db74">&#39;2025-11-20&#39;</span>;
+</span></span></code></pre></div></li>
+<li>避免使用SELECT DISTINCT（可能导致临时表和排序），优先通过GROUP BY去重或优化查询逻辑</li>
+<li>禁止在事务中执行耗时SQL（如大表全表扫描），避免长时间占用锁资源</li>
+</ul>
+<ol start="2">
+<li>安全防护</li>
+</ol>
+<ul>
+<li>禁止拼接SQL字符串（存在SQL注入风险），必须使用<strong>参数化查询</strong>（如<code>SELECT * FROM user WHERE username = ?</code>）</li>
+<li>限制<code>SELECT ... FOR UPDATE</code>的使用范围（会加行锁或表锁），避免锁冲突和死锁</li>
+<li>避免使<strong>HINT</strong>强制索引（如 FORCE INDEX），除非明确优化器选择了错误索引（优化器通常更智能）</li>
+</ul>
+<h3 id="注释规范">注释规范</h3>
+<ul>
+<li>复杂SQL需添加注释，说明业务目的、逻辑要点（单行注释要用<code>--</code>，多行注释用<code>/**/</code>）：
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 统计近30天各用户的有效订单数（排除测试订单和已删除订单）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    user_id,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">AS</span> valid_order_count
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">`</span><span style="color:#66d9ef">order</span><span style="color:#f92672">`</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span>
+</span></span><span style="display:flex;"><span>    is_deleted <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> is_test <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>  <span style="color:#75715e">-- 排除测试订单
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> create_time <span style="color:#f92672">&gt;=</span> DATE_SUB(NOW(), INTERVAL <span style="color:#ae81ff">30</span> <span style="color:#66d9ef">DAY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span>
+</span></span><span style="display:flex;"><span>    user_id;
+</span></span></code></pre></div></li>
+<li>临时调试SQL需标注：<code>TODO：调试用，上线前删除，避免误提交到生产环境</code></li>
+</ul>
+<h3 id="检查清单">检查清单</h3>
+<ol>
+<li>SQL关键字是否大写？格式是否符合换行与缩进规范？</li>
+<li>是否避免了<code>SELECT *</code>，明确指定了所需字段？</li>
+<li>逻辑删除表的<strong>查询</strong>/<strong>更新</strong>是否包含is_deleted条件？</li>
+<li>UPDATE/DELETE是否包含WHERE条件？是否优先逻辑删除？</li>
+<li>多表JOIN是否明确类型？是否<strong>超过3张表</strong>？</li>
+<li>是否存在索引失效场景（如函数操作、隐式类型转换）？</li>
+<li>批量操作是否分批次执行？是否避免了大事务？</li>
+</ol>
+<hr>
+<h2 id="数据库表设计规范">数据库表设计规范</h2>
+<h3 id="基础设计原则">基础设计原则</h3>
+<h3 id="必选字段规范强制要求">必选字段规范（强制要求）</h3>
+<h3 id="字段设计规范">字段设计规范</h3>
+<h3 id="索引设计规范关联补充">索引设计规范（关联补充）</h3>
+<h3 id="表结构示范符合规范">表结构示范（符合规范）</h3>
+<h3 id="设计检查清单">设计检查清单</h3>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>
