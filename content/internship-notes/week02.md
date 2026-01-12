@@ -65,7 +65,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
 - 索引需匹配业务查询场景，避免 “为建而建”（如仅存在UPDATE/DELETE条件但无查询的字段无需索引）
 2. 适度性原则
 - 单表索引数量**不超过5个**（除非表数据量极小且查询复杂），过多索引会导致：
-    - 写入 / 更新性能下降（每次变更需同步维护索引树）
+    - 写入/更新性能下降（每次变更需同步维护索引树）
     - MySQL 优化器选择索引的计算成本升高，可能选错索引
 3. 平衡性原则
 - **查询密集表**（如订单查询表、用户信息表）可适当增加索引（≤8 个）
@@ -80,7 +80,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
     - 优先使用**自增整数型**（INT/BIGINT），优势：
         - 连续写入，减少索引页分裂
         - 索引树结构紧凑，查询效率高
-    - 禁止使用 UUID / 字符串作为主键（离散写入导致大量页分裂，性能下降 50%+）
+    - 禁止使用UUID/字符串作为主键（离散写入导致大量页分裂，性能下降 50%+）
     - 禁止使用业务字段（如订单号、用户手机号）作为主键（业务变更可能导致主键修改）
 - **特性约束**：主键字段禁止更新，避免破坏索引树结构
 2. 普通索引（INDEX）
@@ -100,7 +100,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
         - WHERE b = 2（缺少最左字段a）
         - WHERE a = 1 AND c = 3（跳过b，仅a部分生效）
 - **字段顺序规则**：
-    1. **过滤性优先**：将过滤性强的字段放在左侧（过滤性 = 字段去重后的值数量 / 总记录数，如手机号 > 性别）
+    1. **过滤性优先**：将过滤性强的字段放在左侧（过滤性 = 字段去重后的值数量/总记录数，如手机号 > 性别）
     2. **查询频率优先**：常作为单字段查询的字段放在左侧（可复用索引，如(user_id, status)可同时支持WHERE user_id = ?和WHERE user_id = ? - AND status = ?）
     3. **长度优先**：短字段放左侧（索引树更紧凑，如(status, username)优于(username, status)）
 - **命名规范**：idx_字段1_字段2_字段3（如idx_userid_status）
@@ -120,7 +120,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
 5. 前缀索引
 - **适用场景**：长字符串字段（如VARCHAR(255)、TEXT前 N 位），需加速前缀匹配查询（如WHERE title LIKE 'Java%'）
 - **设计方法**：
-    - 通过SELECT COUNT(DISTINCT LEFT(字段名, N)) / COUNT(*) FROM 表名计算前缀选择性，N 取 “选择性接近 1 且长度最小” 的值（通常 20-50 字符）
+    - 通过SELECT COUNT(DISTINCT LEFT(字段名, N))/COUNT(*) FROM 表名计算前缀选择性，N 取 “选择性接近 1 且长度最小” 的值（通常 20-50 字符）
     - 示例：对title字段建前缀索引：
         > ```sql
         >    CREATE INDEX idx_title_prefix ON article (title(30)); -- 取前30字符
@@ -129,11 +129,11 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
 
 ### 索引设计禁忌
 1. 低价值索引禁止
-- **低基数字段**：禁止对基数 < 10 的字段建索引（如性别gender（男 / 女）、状态status（0/1/2）），索引选择性低，查询可能全表扫描更快
+- **低基数字段**：禁止对基数 < 10 的字段建索引（如性别gender（男/女）、状态status（0/1/2）），索引选择性低，查询可能全表扫描更快
 - **高频更新字段**：避免对更新频率 > 查询频率的字段建索引（如last_modify_time），每次更新会触发索引树重构，影响性能
 - **大字段全索引**：禁止对TEXT、BLOB类型字段建全字段索引（存储成本极高），如需索引必须用前缀索引
 2. 索引失效场景避免
-- **函数 / 表达式操作**：索引字段参与函数或表达式运算会导致索引失效，例如：
+- **函数/表达式操作**：索引字段参与函数或表达式运算会导致索引失效，例如：
     - 错误：`WHERE SUBSTR(phone, 1, 3) = '138'`（函数操作）
     - 错误：`WHERE create_time + INTERVAL 1 DAY > NOW()`（表达式）
     - 正确：`WHERE phone LIKE '138%'`（前缀匹配，可命中索引）
@@ -157,7 +157,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
     - 利用慢查询日志（slow log）和EXPLAIN分析查询计划，识别未使用的索引（type: ALL表示全表扫描）
     - MySQL 8.0 + 可通过sys.schema_unused_indexes视图直接查询未使用的索引
 - **监控指标**：
-    - 索引使用率（使用次数 / 总查询次数）：低于 10% 的索引需评估删除
+    - 索引使用率（使用次数/总查询次数）：低于 10% 的索引需评估删除
     - 索引维护成本（写入时索引更新耗时）：写入频繁且维护成本高的索引优先删除
 2. 索引优化操作
 - **无效索引清理**：对连续 3 个月未使用的索引，经业务确认后删除（删除前备份表结构）
@@ -168,7 +168,7 @@ Hutool是一个小而全的国产开源Java工具类库，通过静态方法封�
 > OPTIMIZE TABLE 表名;
 > ```
 - **大表索引操作**：
-- 表数据量 > 100 万行时，创建 / 删除索引需在业务低峰期执行
+- 表数据量 > 100 万行时，创建/删除索引需在业务低峰期执行
 - MySQL 8.0 + 使用ALTER TABLE ... ALGORITHM=INPLACE减少锁表时间（避免全表锁）
 - 批量导入数据前，先删除索引，导入后重建（减少索引维护开销）
 
@@ -181,7 +181,7 @@ user，含逻辑删除
 | id | BIGINT | PRIMARY KEY | 自增主键，唯一标识用户 |
 | is_deleted | TINYINT | (无单独索引，包含在联合唯一索引中) | 逻辑删除标记 (0 = 未删，1 = 已删) |
 | phone | VARCHAR(20) | UNIQUE INDEX uniq_phone_deleted (phone, is_deleted) | 同上，保证手机号唯一 |
-| user_type | TINYINT | INDEX idx_usertype (user_type) | 用于按用户类型筛选（如会员 / 非会员） |
+| user_type | TINYINT | INDEX idx_usertype (user_type) | 用于按用户类型筛选（如会员/非会员） |
 | username | VARCHAR(50) | UNIQUE INDEX uniq_username_deleted (username, is_deleted) | 联合唯一索引，适配逻辑删除 |
 
 2. 订单表
@@ -192,7 +192,7 @@ order
 | order_no | VARCHAR(32) | UNIQUE INDEX uniq_orderno (order_no) | 订单号唯一，无逻辑删除需求 |
 | user_id | BIGINT | INDEX idx_userid_createtime (user_id, create_time) | 支持“查询用户的订单并按时间排序” |
 | status | TINYINT | INDEX idx_status_createtime (status, create_time) | 支持“查询特定状态的订单并按时间筛选” |
-| pay_time | DATETIME | INDEX idx_paytime (pay_time) | 用于按支付时间统计 / 筛选 |
+| pay_time | DATETIME | INDEX idx_paytime (pay_time) | 用于按支付时间统计/筛选 |
 
 ### 索引设计检查清单
 1. 每张表是否设置自增整数型主键？
@@ -288,7 +288,7 @@ order
     WHERE status IN (1, 2)
     WHERE create_time BETWEEN '2025-01-01' AND '2025-12-31'
     
-    -- 不推荐（可用 IN 替代）
+    -- 不推荐（可用IN替代）
     WHERE status = 1 OR status = 2
     WHERE create_time >= '2025-01-01' AND create_time <= '2025-12-31'
     ```
@@ -336,8 +336,8 @@ order
 - 禁止在ORDER BY中使用表达式或函数（如`ORDER BY YEAR(create_time)`），会导致索引失效
 
 5. 子查询与分页（优先使用Mabatis-plus分页插件）
-- 子查询结果集较大时，建议用 LIMIT 限制行数，或转为 JOIN 操作（子查询可能导致临时表创建）
-- 分页查询必须使用 LIMIT，且优先通过索引字段分页（如`WHERE id > 100 LIMIT 20`优于`LIMIT 100, 20`，避免全表扫描）：
+- 子查询结果集较大时，建议用LIMIT 限制行数，或转为 JOIN 操作（子查询可能导致临时表创建）
+- 分页查询必须使用LIMIT，且优先通过索引字段分页（如`WHERE id > 100 LIMIT 20`优于`LIMIT 100, 20`，避免全表扫描）：
     ```sql
     -- 推荐（基于索引字段分页，高效）
     SELECT id, username FROM user
@@ -375,7 +375,7 @@ order
     ```
 - 大表批量插入（>1000 条）时，需分批次插入（每批 500-1000 条），避免占用过多连接资源
 2. UPDATE与DELETE语句
-- 必须包含 WHERE 条件（除非明确要操作全表），禁止无条件更新 / 删除（避免误操作导致全表数据变更）：
+- 必须包含 WHERE 条件（除非明确要操作全表），禁止无条件更新/删除（避免误操作导致全表数据变更）：
     ```sql
     -- 正确（有明确条件）
     UPDATE user SET status = 0 WHERE id = 100;
@@ -452,13 +452,92 @@ order
 
 ## 数据库表设计规范
 ### 基础设计原则
+1. **业务向导原则**：表结构需精准映射业务实体，遵循“一事一表”，避免“万能表”（如同时存储用户、订单、商品信息的混合表）
+2. **原子性原则**：字段需具备原子性（不可再分），例如禁止用user_info字段存储“姓名+电话”（应差分为username和phone）
+3. **扩展性原则**：预留合理扩展字段（如ext_json存储非核心动态属性），避免频繁`ALTER TABLE`
+4. **一致性原则**：相同含义的字段在全库保持命名、类型、长度一致（如user_id统一为BIGINT，order_no统一为VARCHAR(64)）
 
 ### 必选字段规范（强制要求）
+所有表必须包含以下6个字段，按顺序排列，用于审计追踪和数据管理：
+| 字段名 | 类型 | 长度 | 不是 Null | 默认值 | 注释 | 字符集 | 排序规则 | 其他约束 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| id | BIGINT | 20 | true | - | 主键 (唯一标识) | - | - | 必须为主键，默认必须为自动递增 (AUTO_INCREMENT)，除非其他业务情况无法自增另行想办法 |
+| create_user | VARCHAR | 32 | true | - | 创建人 (操作人 ID) | utf8mb4 | utf8mb4_bin | 存储创建者账号或 ID |
+| create_time | BIGINT | 20 | true | | 创建时间 (时间戳) | - | - | 记录数据插入时的秒级时间戳，默认为当前时间戳 |
+| update_user | VARCHAR | 32 | true | - | 更新人 (操作人 ID) | utf8mb4 | utf8mb4_bin | 存储最后更新者账号或 ID |
+| update_time | BIGINT | 20 | true | | 更新时间 (时间戳) | - | - | 自动更新为最后修改时的秒级时间戳 |
+| dept_id | VARCHAR | 255 | true | - | 创建人所属部门 ID | utf8mb4 | utf8mb4_bin | 关联部门表主键 |
+| is_delete | TINYINT | 4 | true | 0 | 逻辑删除标识 | - | - | 0 = 未删除，1 = 已删除 |
+
+必选字段配置说明：
+- id：强制作为主键，类型为BIGINT，非空且自动递增，禁止使用复合主键
+- create_time/update_time：统一使用BIGINT类型存储**秒级时间戳**（公司特殊规范）
+- 字段顺序强制要求：dept_id必须位于is_delete之前（按上表顺序排列）
+- is_delete：默认值为 0（未删除），删除操作时更新为 1（逻辑删除），禁止物理删除数据
 
 ### 字段设计规范
+1. 命名规范
+- 表名：使用小写字母+下划线，前缀体现业务模块（如user_、order_），例如user_info（用户信息表）、order_detail（订单详情表）
+- 字段名：使用小写字母+下划线，见名知意（如user_name、order_amount），禁止使用拼音（如yonghuming）或缩写（如ord_amt）
+- 禁止使用SQL关键字（如order、user、status），若必须使用需用反引号`` ` ``包裹（如`status`）
+- 状态字段必须用code结尾，比如 status_code, grade_code等
+2. 类型选择规范
+- **主键**：统一为id，类型BIGINT，非空、自动递增（AUTO——INCREMENT），禁止使用INT（可能溢出）、VARCHAR（性能差）
+- **状态字段**：强制使用VARCHAR类型（公司特殊规范），长度根据状态值数量设定（建议2-10），例如order_status
+- **时间类型**：除必选字段create_time/update_time外，其他时间相关字段（如pay_time、login_time）也必须使用BIGINT存储秒级时间戳，禁止使用DATETIME/DATE
+- **字符串类型**：
+    - 短字符串（如手机号、邮箱）用VARCHAR，长度精确匹配最大需求（如手机号VARCHAR(20)，邮箱VARCHAR(128)）
+    - 长文本（如备注、描述）用TEXT或LONGTEXT，避免VARCHAR(255)存储超长篇内容
+    - 字符集统一使用utf8mb4（支持 emoji 和特殊字符），排序规则用utf8mb4_bin（区分大小写，适合精确匹配）
+- **数值类型**：
+    - 整数：优先用INT32位）或BIGINT（64位），避免TINYINT、SMALLINT（扩展性差）；无负数场景加UNSIGNED（如BIGINT UNSIGNED）
+    - 小数：金额、数量等用DECIMAL（精确计算），禁止用FLOAT/DOUBLE（存在精度丢失），例如order_amount DECIMAL(10,2)（最大 99999999.99）
+3. 约束规范
+- **非空约束**：核心业务字段（如user_id、order_no）必须设为`NOT NULL`，避免NULL值导致的查询异常（如NULL != NULL）
+- **默认值**：
+    - 数值型：默认 0（如sort默认 0，quantity默认 0）
+    - 字符串：非空字符串默认空串`''`（避免NULL），如`remark VARCHAR(255) DEFAULT ''`
+    - 时间戳字段：默认值统一为`UNIX_TIMESTAMP()`（当前秒级时间戳）
+- **唯一约束**：业务唯一字段需加唯一索引（如order_no、phone），逻辑删除表需包含is_delete（见[`索引规范`](#mysql索引设计规范)）
 
 ### 索引设计规范（关联补充）
+1. **主键索引**：id字段自动创建主键索引，无需额外定义
+2. **唯一索引**：
+- 单一唯一字段：`UNIQUE INDEX uniq_字段名 (字段名)`（如`uniq_order_no (order_no)`）
+- 逻辑删除表的唯一索引：需包含is_delete，如`UNIQUE INDEX uniq_phone_delete (phone, is_delete)`（避免删除记录阻塞新数据插入）
+3. **普通索引**：查询频繁的字段（如user_id、create_time）创建普通索引，命名格式idx_字段名
+4. **联合索引**：多字段查询场景创建联合索引，遵循最左前缀原则，命名格式idx_字段1_字段2（如idx_user_id_create_time）
 
 ### 表结构示范（符合规范）
-
+```sql
+CREATE TABLE `user_info` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '用户名',
+  `phone` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '手机号',
+  `user_status_code` VARCHAR(2) NOT NULL DEFAULT '0' COMMENT '用户状态：0-正常，1-冻结',
+  `age` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '年龄',
+  `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '账户余额',
+  `last_login_time` BIGINT NOT NULL DEFAULT 0 COMMENT '最后登录时间（时间戳）',
+  `create_user` VARCHAR(32) NOT NULL COMMENT '创建人',
+  `create_time` BIGINT NOT NULL DEFAULT UNIX_TIMESTAMP() COMMENT '创建时间（时间戳）',
+  `update_user` VARCHAR(32) NOT NULL COMMENT '更新人',
+  `update_time` BIGINT NOT NULL DEFAULT UNIX_TIMESTAMP() ON UPDATE UNIX_TIMESTAMP() COMMENT '更新时间（时间戳）',
+  `dept_id` VARCHAR(255) NOT NULL COMMENT '创建人部门ID',
+  `is_delete` INT NOT NULL DEFAULT 0 COMMENT '逻辑删除标识：0-未删，1-已删',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uniq_phone_delete` (`phone`, `is_delete`) COMMENT '手机号唯一（含逻辑删除）',
+  INDEX `idx_user_status_code` (`user_status_code`) COMMENT '用户状态索引',
+  INDEX `idx_create_time` (`create_time`) COMMENT '创建时间索引',
+  INDEX `idx_last_login_time` (`last_login_time`) COMMENT '最后登录时间索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户信息表';
+```
 ### 设计检查清单
+1. 表是否包含id、create_user、create_time、update_user、update_time、dept_id、is_delete7 个必选字段？
+2. id是否为BIGINT类型且为主键、自动递增？
+3. create_time和update_time是否为BIGINT类型，且update_time配置自动更新？
+4. 状态字段是否为VARCHAR类型？
+5. 字段命名是否符合“小写+下划线”规则，无拼音或关键字？
+6. 核心字段是否设置NOT NULL约束，默认值是否合理？
+7. 字符串字段是否使用utf8mb4字符集，排序规则是否为utf8mb4_bin？
+8. 逻辑删除表的唯一索引是否包含is_delete字段？
+9. 表名是否包含业务模块前缀，是否符合“一事一表”原则？
