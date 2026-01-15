@@ -2,6 +2,8 @@
 date = '2026-01-12T18:05:48+08:00'
 draft = false
 title = 'Week03'
+toc = true
+tocBorder = true
 +++
 # 全局配置规范
 ## 配置文件命名规范
