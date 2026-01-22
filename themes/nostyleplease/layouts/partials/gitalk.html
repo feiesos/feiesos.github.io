@@ -6,7 +6,7 @@
   const gitalk = new Gitalk({
     clientID: '{{ .Site.Params.Gitalk.clientID }}',
     clientSecret: '{{ .Site.Params.Gitalk.clientSecret }}',
-    proxy: 'https://cors-server.vercel.app/github_access_token',
+    proxy: '{{ .Site.Params.Gitalk.proxy }}',
     repo: '{{ .Site.Params.Gitalk.repo }}',
     owner: '{{ .Site.Params.Gitalk.owner }}',
     admin: ['{{ .Site.Params.Gitalk.owner }}'],
@@ -15,10 +15,10 @@
   });
   (function() {
     // 本地预览时不加载评论
-    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-      document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
-      return;
-    }
+    // if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+    //   document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
+    //   return;
+    // }
     gitalk.render('gitalk-container');
   })();
 </script>

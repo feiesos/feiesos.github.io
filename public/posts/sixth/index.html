@@ -25,7 +25,7 @@ QoS 2 (Exactly once)：恰好一次。“四步握手”机制2保证消息到�
 
 你匆忙进入电梯，很着急地想去7楼，于是你狂按按钮“7”，按钮灯亮起，电梯将你送往7楼。
 
-这就是一个典型的幂等性操作，无论你按一次还是多次（当然我们忽略有双击取消功能的电梯），电梯最终会把把你送到7楼一次。
+这就是一个典型的幂等性操作，无论你按一次还是多次（当然我们忽略有双击取消功能的电梯），电梯最终会把你送到7楼一次。
 如果我们的消费端业务代码具有幂等性，让多次消费等同于一次消费，那消息重复的问题不就迎刃而解了吗？没错，确实如此。
 但是我们要怎么实现呢？
 如何实现幂等性操作
@@ -147,7 +147,7 @@ Token机制
 <blockquote>
 <p>你匆忙进入电梯，很着急地想去7楼，于是你狂按按钮“7”，按钮灯亮起，电梯将你送往7楼。</p>
 </blockquote>
-<p>这就是一个典型的幂等性操作，无论你按一次还是多次（当然我们忽略有双击取消功能的电梯），电梯最终会把把你送到7楼一次。</p>
+<p>这就是一个典型的幂等性操作，无论你按一次还是多次（当然我们忽略有双击取消功能的电梯），电梯最终会把你送到7楼一次。</p>
 <p>如果我们的消费端业务代码具有幂等性，让多次消费等同于一次消费，那消息重复的问题不就迎刃而解了吗？没错，确实如此。</p>
 <p>但是我们要怎么实现呢？</p>
 <h3 id="如何实现幂等性操作">如何实现幂等性操作</h3>
@@ -204,8 +204,8 @@ Token机制
   const gitalk = new Gitalk({
     clientID: 'Ov23liutI7L71Kv4y4Qq',
     clientSecret: 'afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2',
-    proxy: 'https://cors-server.vercel.app/github_access_token',
-    repo: 'https:\/\/github.com\/feiesos\/feiesos.github.io',
+    proxy: 'https:\/\/my-gitalk-proxy.f10000914.workers.dev',
+    repo: 'feiesos.github.io',
     owner: 'feiesos',
     admin: ['feiesos'],
     id: location.pathname, 
@@ -213,10 +213,10 @@ Token机制
   });
   (function() {
     
-    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-      document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
-      return;
-    }
+    
+    
+    
+    
     gitalk.render('gitalk-container');
   })();
 </script>

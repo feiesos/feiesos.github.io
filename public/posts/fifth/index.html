@@ -134,8 +134,8 @@ DISM 工具会报告映像是否健康、可修复或不可修复。如果映像
   const gitalk = new Gitalk({
     clientID: 'Ov23liutI7L71Kv4y4Qq',
     clientSecret: 'afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2',
-    proxy: 'https://cors-server.vercel.app/github_access_token',
-    repo: 'https:\/\/github.com\/feiesos\/feiesos.github.io',
+    proxy: 'https:\/\/my-gitalk-proxy.f10000914.workers.dev',
+    repo: 'feiesos.github.io',
     owner: 'feiesos',
     admin: ['feiesos'],
     id: location.pathname, 
@@ -143,10 +143,10 @@ DISM 工具会报告映像是否健康、可修复或不可修复。如果映像
   });
   (function() {
     
-    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-      document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.';
-      return;
-    }
+    
+    
+    
+    
     gitalk.render('gitalk-container');
   })();
 </script>

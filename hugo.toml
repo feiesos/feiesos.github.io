@@ -9,5 +9,6 @@ theme = 'nostyleplease'
 [params.gitalk]
   clientID = "Ov23liutI7L71Kv4y4Qq"
   clientSecret = "afc44c8b83a211534ea2b72eff3fceaa9eb3c7e2"
-  repo = "https://github.com/feiesos/feiesos.github.io"
+  repo = "feiesos.github.io"
   owner = "feiesos"
+  proxy = "https://my-gitalk-proxy.f10000914.workers.dev"
