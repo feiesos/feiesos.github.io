@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="消息队列
+是什么？
+消息队列（Message Queue, MQ）是一种中间件，允许应用程序之间进行异步通信，存储消息（数据包），实现解耦、异步处理、流量削峰（缓冲高并发），确保数据在生产者和消费者之间可靠传递，是分布式系统中的核心组件。常见的消息队列有RabbitMQ、Kafka和RockerMQ。
+简单说，消息队列就是一个存放消息的容器，当我们消费消息时，直接从容器中取出即可。由于队列是一种先进先出的数据结构，所以消费消息的时也是按照顺序进行的。
+参与消息传递的双方成为生产者和消费者，生产者负责发送消息，消费者负责处理消息。
+能干什么？
+通常来说，使用消息队列主要能为我们实现：
+
+异步处理
+削峰/限流
+降低系统耦合性
+顺序保证
+分布式事务
+数据流处理
+&hellip;
+
+可能带来的问题
+
+系统可用性降低：系统可用性在某种程度上降低，在加入消息队列后，可能会遇到消息丢失或者MQ挂掉的问题
+系统复杂性提高：系统加入消息队列无疑会增加复杂度，出MQ本身还要去处理消息重复消费、消息丢失、消息传递的顺序性等问题
+一致性问题：消息队列带来的异步确实可以提高系统的响应速度，不过也会带来一致性问题，比如消息的真正消费者并没有正确消费消息
+">  
+
+  <title>
+    
+      Week05
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2026-01-19 14:39:28 &#43;0800 CST">
+            2026-01-19
+        </time>
+    </p>
+
+    <h1>Week05</h1>
+
+    
+        <aside  class="toc" >
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#是什么">是什么？</a></li>
+    <li><a href="#能干什么">能干什么？</a></li>
+    <li><a href="#可能带来的问题">可能带来的问题</a></li>
+  </ul>
+</nav>
+        </aside>
+    
+
+    <h1 id="消息队列">消息队列</h1>
+<h2 id="是什么">是什么？</h2>
+<p>消息队列（Message Queue, MQ）是一种中间件，允许应用程序之间进行异步通信，存储消息（数据包），实现解耦、异步处理、流量削峰（缓冲高并发），确保数据在生产者和消费者之间可靠传递，是分布式系统中的核心组件。常见的消息队列有RabbitMQ、Kafka和RockerMQ。</p>
+<p>简单说，消息队列就是一个存放消息的容器，当我们消费消息时，直接从容器中取出即可。由于队列是一种先进先出的数据结构，所以消费消息的时也是按照顺序进行的。</p>
+<p>参与消息传递的双方成为<strong>生产者</strong>和<strong>消费者</strong>，生产者负责发送消息，消费者负责处理消息。</p>
+<h2 id="能干什么">能干什么？</h2>
+<p>通常来说，使用消息队列主要能为我们实现：</p>
+<ol>
+<li>异步处理</li>
+<li>削峰/限流</li>
+<li>降低系统耦合性</li>
+<li>顺序保证</li>
+<li>分布式事务</li>
+<li>数据流处理</li>
+<li>&hellip;</li>
+</ol>
+<h2 id="可能带来的问题">可能带来的问题</h2>
+<ol>
+<li>系统可用性降低：系统可用性在某种程度上降低，在加入消息队列后，可能会遇到消息丢失或者MQ挂掉的问题</li>
+<li>系统复杂性提高：系统加入消息队列无疑会增加复杂度，出MQ本身还要去处理消息重复消费、消息丢失、消息传递的顺序性等问题</li>
+<li>一致性问题：消息队列带来的异步确实可以提高系统的响应速度，不过也会带来一致性问题，比如消息的真正消费者并没有正确消费消息</li>
+</ol>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>

@@ -6,8 +6,15 @@
     <description>Recent content on Feiesos&#39; blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 14 Jan 2026 11:17:02 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 19 Jan 2026 14:39:28 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Week05</title>
+      <link>http://localhost:1313/internship-notes/week05/</link>
+      <pubDate>Mon, 19 Jan 2026 14:39:28 +0800</pubDate>
+      <guid>http://localhost:1313/internship-notes/week05/</guid>
+      <description>&lt;h1 id=&#34;消息队列&#34;&gt;消息队列&lt;/h1&gt;&#xA;&lt;h2 id=&#34;是什么&#34;&gt;是什么？&lt;/h2&gt;&#xA;&lt;p&gt;消息队列（Message Queue, MQ）是一种中间件，允许应用程序之间进行异步通信，存储消息（数据包），实现解耦、异步处理、流量削峰（缓冲高并发），确保数据在生产者和消费者之间可靠传递，是分布式系统中的核心组件。常见的消息队列有RabbitMQ、Kafka和RockerMQ。&lt;/p&gt;&#xA;&lt;p&gt;简单说，消息队列就是一个存放消息的容器，当我们消费消息时，直接从容器中取出即可。由于队列是一种先进先出的数据结构，所以消费消息的时也是按照顺序进行的。&lt;/p&gt;&#xA;&lt;p&gt;参与消息传递的双方成为&lt;strong&gt;生产者&lt;/strong&gt;和&lt;strong&gt;消费者&lt;/strong&gt;，生产者负责发送消息，消费者负责处理消息。&lt;/p&gt;&#xA;&lt;h2 id=&#34;能干什么&#34;&gt;能干什么？&lt;/h2&gt;&#xA;&lt;p&gt;通常来说，使用消息队列主要能为我们实现：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;异步处理&lt;/li&gt;&#xA;&lt;li&gt;削峰/限流&lt;/li&gt;&#xA;&lt;li&gt;降低系统耦合性&lt;/li&gt;&#xA;&lt;li&gt;顺序保证&lt;/li&gt;&#xA;&lt;li&gt;分布式事务&lt;/li&gt;&#xA;&lt;li&gt;数据流处理&lt;/li&gt;&#xA;&lt;li&gt;&amp;hellip;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;可能带来的问题&#34;&gt;可能带来的问题&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;系统可用性降低：系统可用性在某种程度上降低，在加入消息队列后，可能会遇到消息丢失或者MQ挂掉的问题&lt;/li&gt;&#xA;&lt;li&gt;系统复杂性提高：系统加入消息队列无疑会增加复杂度，出MQ本身还要去处理消息重复消费、消息丢失、消息传递的顺序性等问题&lt;/li&gt;&#xA;&lt;li&gt;一致性问题：消息队列带来的异步确实可以提高系统的响应速度，不过也会带来一致性问题，比如消息的真正消费者并没有正确消费消息&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
+    </item>
     <item>
       <title>Week04</title>
       <link>http://localhost:1313/internship-notes/week04/</link>
