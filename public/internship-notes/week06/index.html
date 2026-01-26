@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="日志规范
+使用日志框架API
+应用中不可直接只用日志系统（Log4j、Logback）中的API，而应依赖使用日志框架SLFJ中的API，使用门面模式的日志框架，有利于维护和各个类的之日处理方式统一。
+日志文件保存时间
+日志文件推荐至少保存15天，因为有些异常具备以“周”为频次发生的特点。
+扩展日志命名方式
+应用中的扩展日志（如打点、临时监控、访问日志等）命名方式：appName_logType_logName.log。
+logType：日志类型，推荐分类有stats/monitor/visit等；logName：日志描述。
+这种命名的好处是，通过文件名就可知道日志文件属于什么应用，什么类型，什么目的，也有利于归类查找。
+
+正例：mappserver应用中单独监控时区转换异常，如：mppserver_monitor_timeZoneConvert.log
+
+
+说明：推荐对日志进行分类，如将错误日志和业务日志分开存放，便于开发人员查看，也便于通过日志对系统进行及时监控。
+
+日志条件输出
+对trace/debug/info级别的日志输出，必须使用条件输出形式或者使用占位符的方式。
+
+说明：logger.debug(&quot;Processing trade with id: &quot; &#43; id &#43; &quot; and symbol: &quot; &#43; symbol);如果日志几倍是warn，上述日志不会打印，但是会执行字符串拼接操作，如果sysmbol是对象，会执行toString()方法，浪费了系统资源，执行了上述操作，最终日志却没有打印。
+
+
+正例：
+(条件)
+if (logger.isDebugEnabled()){
+logger.debug(&#34;Processing trade with id: &#34; &#43; id &#43; &#34; and symbol: &#34; &#43; symbol);
+}
+或
+(占位符)
+logger.debug(&#34;Processing trade with id: {} adn sysmol: {} &#34;, id, symbol);
+
+避免重复打印
+避免重复打印日志，浪费磁盘空间，务必在log4j.xml中设置additivity=false。
+
+正例：&lt;logger name=&quot;com.taobao.dubbo.config&quot; additivity=&quot;false&quot;&gt;
+
+异常信息日志
+异常信息应该包括两类信息：案发现场信息和异常堆栈信息。如果不处理，那么通过关键字throws往上抛出。
+
+正例：logger.error(各类参数或者对象toString &#43; &quot;_&quot; &#43; e.getMessage(), e);
+
+谨慎记录日志
+谨慎地记录日志。">  
+
+  <title>
+    
+      Week06
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2026-01-26 15:48:07 &#43;0800 CST">
+            2026-01-26
+        </time>
+    </p>
+
+    <h1>Week06</h1>
+
+    
+        <aside  class="toc" >
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#使用日志框架api">使用日志框架API</a></li>
+    <li><a href="#日志文件保存时间">日志文件保存时间</a></li>
+    <li><a href="#扩展日志命名方式">扩展日志命名方式</a></li>
+    <li><a href="#日志条件输出">日志条件输出</a></li>
+    <li><a href="#避免重复打印">避免重复打印</a></li>
+    <li><a href="#异常信息日志">异常信息日志</a></li>
+    <li><a href="#谨慎记录日志">谨慎记录日志</a></li>
+    <li><a href="#合理使用warn和error级别日志">合理使用warn和error级别日志</a></li>
+  </ul>
+</nav>
+        </aside>
+    
+
+    <h1 id="日志规范">日志规范</h1>
+<h2 id="使用日志框架api">使用日志框架API</h2>
+<p>应用中不可直接只用日志系统（Log4j、Logback）中的API，而应依赖使用日志框架SLFJ中的API，使用门面模式的日志框架，有利于维护和各个类的之日处理方式统一。</p>
+<h2 id="日志文件保存时间">日志文件保存时间</h2>
+<p>日志文件推荐至少保存15天，因为有些异常具备以“周”为频次发生的特点。</p>
+<h2 id="扩展日志命名方式">扩展日志命名方式</h2>
+<p>应用中的扩展日志（如打点、临时监控、访问日志等）命名方式：appName_logType_logName.log。</p>
+<p>logType：日志类型，推荐分类有stats/monitor/visit等；logName：日志描述。</p>
+<p>这种命名的好处是，通过文件名就可知道日志文件属于什么应用，什么类型，什么目的，也有利于归类查找。</p>
+<blockquote>
+<p>正例：mappserver应用中单独监控时区转换异常，如：<code>mppserver_monitor_timeZoneConvert.log</code></p>
+</blockquote>
+<blockquote>
+<p>说明：推荐对日志进行分类，如将错误日志和业务日志分开存放，便于开发人员查看，也便于通过日志对系统进行及时监控。</p>
+</blockquote>
+<h2 id="日志条件输出">日志条件输出</h2>
+<p>对trace/debug/info级别的日志输出，必须使用条件输出形式或者使用占位符的方式。</p>
+<blockquote>
+<p>说明：<code>logger.debug(&quot;Processing trade with id: &quot; + id + &quot; and symbol: &quot; + symbol);</code>如果日志几倍是warn，上述日志不会打印，但是会执行字符串拼接操作，如果sysmbol是对象，会执行<code>toString()</code>方法，浪费了系统资源，执行了上述操作，最终日志却没有打印。</p>
+</blockquote>
+<blockquote>
+<p>正例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>(条件)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (logger.<span style="color:#a6e22e">isDebugEnabled</span>()){
+</span></span><span style="display:flex;"><span>logger.<span style="color:#a6e22e">debug</span>(<span style="color:#e6db74">&#34;Processing trade with id: &#34;</span> <span style="color:#f92672">+</span> id <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; and symbol: &#34;</span> <span style="color:#f92672">+</span> symbol);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>或</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>(占位符)
+</span></span><span style="display:flex;"><span>logger.<span style="color:#a6e22e">debug</span>(<span style="color:#e6db74">&#34;Processing trade with id: {} adn sysmol: {} &#34;</span>, id, symbol);
+</span></span></code></pre></div></blockquote>
+<h2 id="避免重复打印">避免重复打印</h2>
+<p>避免重复打印日志，浪费磁盘空间，务必在log4j.xml中设置additivity=false。</p>
+<blockquote>
+<p>正例：<code>&lt;logger name=&quot;com.taobao.dubbo.config&quot; additivity=&quot;false&quot;&gt;</code></p>
+</blockquote>
+<h2 id="异常信息日志">异常信息日志</h2>
+<p>异常信息应该包括两类信息：案发现场信息和异常堆栈信息。如果不处理，那么通过关键字throws往上抛出。</p>
+<blockquote>
+<p>正例：<code>logger.error(各类参数或者对象toString + &quot;_&quot; + e.getMessage(), e);</code></p>
+</blockquote>
+<h2 id="谨慎记录日志">谨慎记录日志</h2>
+<p>谨慎地记录日志。</p>
+<p>生产环境禁止输出debug日志；有选择地输出info日志；如果使用warn来记录刚上线时的业务行为信息，一定要注意日志输出量的问题，避免把服务器磁盘撑爆，并记得及时删除这些观察日志。</p>
+<blockquote>
+<p>说明：大量地输出无效日志，不利于系统性能提升，也不利于快速定位错误点。记录日志时请思考：这些日志真的有人看吗？看到这条日志你能做什么？能不能给问题排查带来好处？</p>
+</blockquote>
+<h2 id="合理使用warn和error级别日志">合理使用warn和error级别日志</h2>
+<p>可以使用warn日志级别来记录用户输入参数错误的情况，避免用户投诉时，无所适从。如非必要，请不要在此场景打出error级别，避免频繁报警。</p>
+<blockquote>
+<p>说明：注意日志输出的级别，error级别只记录系统逻辑出错、异常或者重要的错误信息。</p>
+</blockquote>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>
