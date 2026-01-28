@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="description" content="Nginx
+Nginx是什么
+Nginx(engine x)是一个轻量级、高性能的HTTP和反向代理服务器，也是一个IMAP/POP3/SMTP代理服务器。
+Nginx在高链接并发的情况下有不错的性能。
+Nginx使用C编写，无论是系统资源开销还是CPU使用效率都不错。
+Nginx安装简单，配置文件简洁（还支持perl语法），运行稳定。
+什么是反向代理？
+反向代理（Reverse Proxy）方式是指以代理服务器来接受internet上的连接请求，然后将请求转发给内部网路上的服务器，并将从服务器上得到的结果返回给internet上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。
+Nginx常用命令
+常用到的命令如下：
+nginx -s stop       快速关闭Nginx，可能不保存相关信息，并迅速终止Web服务
+nginx -s quit       平稳关闭Nginx，保存相关信息，有安排的结束Web服务
+nginx -s reload     因改变了Nginx相关配置，需要从新加载配置而重载
+nginx -s reopen     重新打开日志文件
+nginx -c &lt;/path/to/config&gt;   为Nginx指定一个配置文件，来代替缺省的
+nginx -t            不运行，仅仅测试配置文件，Nginx将检查配置文件的语法的正确性，并尝试打开配置文件中所引用到的文件
+nginx -v            显示Nginx的版本
+nginx -V            显示Nginx的版本，编译器版本和配置参数
+Nginx配置
+更详细内容参考Nginx中文维基1。
+
+
+
+
+Nginx中文维基：https://tool.oschina.net/apidocs/apidoc?api=nginx-zh&#160;&#x21a9;&#xfe0e;
+
+
+">  
+
+  <title>
+    
+      Week07
+    
+  </title>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/" />
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.900100e9dbee2d56c58fac8bb717037cae7e26a9c36c29d2ff587bdd65f0cbbe510b41d81a3bb234919cdfdc7550d786b2fab70c8fc507772d732fe097106d12.css" integrity="sha512-kAEA6dvuLVbFj6yLtxcDfK5&#43;JqnDbCnS/1h73WXwy75RC0HYGjuyNJGc39x1UNeGsvq3DI/FB3ctcy/glxBtEg==" />
+  
+</head>
+<body a="auto">
+        <main class="page-content" aria-label="Content">
+            <div class="w">
+<a href="/">..</a>
+
+
+<article>
+    <p class="post-meta">
+        <time datetime="2026-01-27 17:34:19 &#43;0800 CST">
+            2026-01-27
+        </time>
+    </p>
+
+    <h1>Week07</h1>
+
+    
+
+    <h1 id="nginx">Nginx</h1>
+<h2 id="nginx是什么">Nginx是什么</h2>
+<p>Nginx(engine x)是一个轻量级、高性能的HTTP和反向代理服务器，也是一个IMAP/POP3/SMTP代理服务器。</p>
+<p>Nginx在高链接并发的情况下有不错的性能。</p>
+<p>Nginx使用C编写，无论是系统资源开销还是CPU使用效率都不错。</p>
+<p>Nginx安装简单，配置文件简洁（还支持perl语法），运行稳定。</p>
+<h2 id="什么是反向代理">什么是反向代理？</h2>
+<p>反向代理（Reverse Proxy）方式是指以代理服务器来接受internet上的连接请求，然后将请求转发给内部网路上的服务器，并将从服务器上得到的结果返回给internet上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。</p>
+<h2 id="nginx常用命令">Nginx常用命令</h2>
+<p>常用到的命令如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nginx -s stop       快速关闭Nginx，可能不保存相关信息，并迅速终止Web服务
+</span></span><span style="display:flex;"><span>nginx -s quit       平稳关闭Nginx，保存相关信息，有安排的结束Web服务
+</span></span><span style="display:flex;"><span>nginx -s reload     因改变了Nginx相关配置，需要从新加载配置而重载
+</span></span><span style="display:flex;"><span>nginx -s reopen     重新打开日志文件
+</span></span><span style="display:flex;"><span>nginx -c &lt;/path/to/config&gt;   为Nginx指定一个配置文件，来代替缺省的
+</span></span><span style="display:flex;"><span>nginx -t            不运行，仅仅测试配置文件，Nginx将检查配置文件的语法的正确性，并尝试打开配置文件中所引用到的文件
+</span></span><span style="display:flex;"><span>nginx -v            显示Nginx的版本
+</span></span><span style="display:flex;"><span>nginx -V            显示Nginx的版本，编译器版本和配置参数
+</span></span></code></pre></div><h2 id="nginx配置">Nginx配置</h2>
+<p>更详细内容参考Nginx中文维基<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>。</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Nginx中文维基：<a href="https://tool.oschina.net/apidocs/apidoc?api=nginx-zh">https://tool.oschina.net/apidocs/apidoc?api=nginx-zh</a>&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</article>
+
+                
+    
+    
+        
+        <footer class="site-footer">
+            <p>&copy; 2026 Feiesos&#39; blog</p>
+        </footer>
+    
+
+
+            </div>
+        </main>
+    </body>
+</html>
