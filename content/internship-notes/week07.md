@@ -30,6 +30,34 @@ nginx -V            显示Nginx的版本，编译器版本和配置参数
 ```
 
 ## Nginx配置
+### Nginx配置文件结构
+Nginx的命令很少，只负责启停服务器等简单功能，Nginx的逻辑主要通过配置体现。
+
+Nginx配置的基本结构：
+```nginx
+...         # 全局块
+
+events {    # events块
+    ...
+}
+
+http {      # http块
+    ...     # http全局块
+    server {    # server块
+        ...     # server全局块
+        location [PATTERN] {    # location块
+            ...
+        }
+        location [PATTERN] {
+            ...
+        }
+    }
+    server {
+        ...
+    }
+    ...
+}
+```
 
 更详细内容参考Nginx中文维基[^1]。
 
